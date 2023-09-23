@@ -140,7 +140,8 @@ public abstract class DragObject : OutLineObj
     {
         MouseUp(mousePos);
     }
-    
+
+    [Server]
     public void MouseUp(Vector3 screenPos)
     {
         if (m_dragState.Value != DragObjState.Moving)
@@ -168,6 +169,7 @@ public abstract class DragObject : OutLineObj
         }
     }
 
+    [Server]
     protected virtual bool RaycastContanier(Vector3 screenPos)
     {
         Ray ray = Camera.main.ScreenPointToRay(screenPos);
@@ -192,6 +194,7 @@ public abstract class DragObject : OutLineObj
         return false;
     }
 
+    [Server]
     public virtual IEnumerator ApplyAttachTransform(Transform attachTrans, UnityAction callback)
     {
         #region 旧方法看起来不够灵活

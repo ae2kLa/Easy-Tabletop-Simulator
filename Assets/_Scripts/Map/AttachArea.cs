@@ -8,12 +8,10 @@ public class AttachArea : OutLineObj, IAttachable
 {
     public GridData Grid;
 
-
     public override void OnStartServer()
     {
         Init();
     }
-
 
     protected override void Init()
     {
@@ -33,6 +31,8 @@ public class AttachArea : OutLineObj, IAttachable
             rb.constraints = RigidbodyConstraints.FreezeAll;
             rb.freezeRotation = true;
         }));
+
+        //TODO:‘⁄¥À≈–∂œ §∏∫
     }
 
 }

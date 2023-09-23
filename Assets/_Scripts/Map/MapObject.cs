@@ -45,16 +45,6 @@ public class MapObject : NetworkBehaviour
         ServerStarted = true;
     }
 
-    public override void OnStartClient()
-    {
-        if (AttachParent == null)
-        {
-            var GO = new GameObject("AttachParent");
-            AttachParent = GO.transform;
-        }
-    }
-
-
     [Server]
     public void MapInit()
     {
@@ -65,7 +55,8 @@ public class MapObject : NetworkBehaviour
             m_grids[x, z] = new GridData(x, z, transform, offset, gridSize);
             var attachArea = GameObject.Instantiate(AttachPrefab, m_grids[x, z].WorldPos, Quaternion.identity, AttachParent);
 
-            NetworkServer.Spawn(attachArea, connectionToClient);
+            //客户端无需生成
+            //NetworkServer.Spawn(attachArea, connectionToClient);
 
             attachArea.GetComponent<AttachArea>().Grid = m_grids[x, z];
         });

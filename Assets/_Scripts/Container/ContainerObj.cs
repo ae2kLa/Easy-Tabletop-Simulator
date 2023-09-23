@@ -65,19 +65,19 @@ public abstract class ContainerObj : OutLineObj, IAttachable
             return;
         }
 
-        Contents.Add(dragObject);
         dragObject.RpcBeAdd();
+        Contents.Add(dragObject);
     }
 
     public override void OnMouseDown()
     {
-        CmdGet(Contents);
+        CmdGet();
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdGet(List<DragObject> contents)
+    public void CmdGet()
     {
-        if (contents.Count == 0)
+        if (Contents.Count == 0)
         {
             if (CountUnlimitedToggle)
             {
@@ -95,8 +95,8 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         }
         else
         {
-            CurrentDragObj = contents[contents.Count - 1];
-            contents.RemoveAt(contents.Count - 1);
+            CurrentDragObj = Contents[Contents.Count - 1];
+            Contents.RemoveAt(Contents.Count - 1);
         }
 
         CurrentDragObj.MouseDown();
