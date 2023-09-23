@@ -1,3 +1,4 @@
+using Mirror;
 using QFramework;
 using Sirenix.OdinInspector;
 using System;
@@ -76,8 +77,17 @@ public abstract class DragObject : OutLineObj
 
     public override void OnMouseDown()
     {
-        base.OnMouseDown();
+        CmdMouseDown();
+    }
 
+    [Command(requiresAuthority = false)]
+    public void CmdMouseDown()
+    {
+        MouseDown();
+    }
+
+    public void MouseDown()
+    {
         if (m_dragState.Value != DragObjState.Available)
         {
             return;
@@ -89,12 +99,19 @@ public abstract class DragObject : OutLineObj
         ChangeLayer("IgnoreRaycast");
     }
 
+
     public void OnMouseDrag()
     {
-        Drag(Input.mousePosition);
+        CmdMouseDrag(Input.mousePosition);
     }
 
-    public void Drag(Vector3 screenPos)
+    [Command(requiresAuthority = false)]
+    public void CmdMouseDrag(Vector3 screenPos)
+    {
+        MouseDrag(screenPos);
+    }
+
+    public void MouseDrag(Vector3 screenPos)
     {
         if (m_dragState.Value != DragObjState.Moving)
         {
@@ -115,9 +132,15 @@ public abstract class DragObject : OutLineObj
 
     public void OnMouseUp()
     {
-
+        CmdMouseUp(Input.mousePosition);
     }
 
+    [Command(requiresAuthority = false)]
+    public void CmdMouseUp(Vector3 mousePos)
+    {
+        MouseUp(mousePos);
+    }
+    
     public void MouseUp(Vector3 screenPos)
     {
         if (m_dragState.Value != DragObjState.Moving)

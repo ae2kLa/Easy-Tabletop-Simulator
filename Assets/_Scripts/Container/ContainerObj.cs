@@ -101,7 +101,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
             contents.RemoveAt(contents.Count - 1);
         }
 
-        CurrentDragObj.OnMouseDown();
+        CurrentDragObj.MouseDown();
         CurrentDragObj.gameObject.SetActive(true);
     }
 
@@ -113,14 +113,14 @@ public abstract class ContainerObj : OutLineObj, IAttachable
 
     public void OnMouseDrag()
     {
-        //服务端要使用的是当前客户端的鼠标位置，而非服务端的鼠标位置
-        CmdDrag(Input.mousePosition);
+        //服务端要使用的是客户端的鼠标位置，而非服务端的鼠标位置，OnMouseUp同
+        CmdMouseDrag(Input.mousePosition);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdDrag(Vector3 mousePos)
+    public void CmdMouseDrag(Vector3 mousePos)
     {
-        CurrentDragObj?.Drag(mousePos);
+        CurrentDragObj?.MouseDrag(mousePos);
     }
 
     public void OnMouseUp()
