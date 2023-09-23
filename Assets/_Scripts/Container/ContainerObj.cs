@@ -125,39 +125,14 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         CurrentDragObj?.OnMouseDrag();
     }
 
+    public void OnMouseUp()
+    {
+        CmdMouseUp();
+    }
 
-    ///// <summary>
-    ///// ///****************************************
-    ///// </summary>
-    //protected uint m_currentNetId = 0;
-
-    //public override void OnMouseDown()
-    //{
-    //    base.OnMouseDown();
-    //    CmdMouseDown();
-    //    //m_currentDragObj?.OnMouseDown();
-    //}
-
-    //public void OnMouseDrag()
-    //{
-    //    //m_currentDragObj?.OnMouseDrag();
-    //}
-
-    //[Command]
-    //public void CmdMouseDrag()
-    //{
-
-    //}
-
-    //public void OnMouseUp()
-    //{
-    //    //m_currentDragObj?.OnMouseUp();
-    //    CmdMouseUp();
-    //}
-
-    //[Command]
-    //public void CmdMouseUp()
-    //{
-    //    m_currentNetId = 0;
-    //}
+    [Command(requiresAuthority = false)]
+    public void CmdMouseUp()
+    {
+        CurrentDragObj?.OnMouseUp();
+    }
 }
