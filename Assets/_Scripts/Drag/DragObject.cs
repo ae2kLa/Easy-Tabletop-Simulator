@@ -243,5 +243,18 @@ public abstract class DragObject : OutLineObj
         }
     }
 
+    [ClientRpc]
+    public void RpcBeAdd()
+    {
+        gameObject.SetActive(false);
+        transform.position = this.transform.position + Vector3.up * 10f;
+        transform.rotation = Quaternion.identity;
+    }
+
+    [ClientRpc]
+    public void RpcBeGet()
+    {
+        gameObject.SetActive(true);
+    }
 
 }

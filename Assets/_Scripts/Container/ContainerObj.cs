@@ -66,9 +66,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         }
 
         Contents.Add(dragObject);
-        dragObject.gameObject.SetActive(false);
-        dragObject.transform.position = this.transform.position + Vector3.up * 10f;
-        dragObject.transform.rotation = Quaternion.identity;
+        dragObject.RpcBeAdd();
     }
 
     public override void OnMouseDown()
@@ -102,7 +100,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         }
 
         CurrentDragObj.MouseDown();
-        CurrentDragObj.gameObject.SetActive(true);
+        CurrentDragObj.RpcBeGet();
     }
 
     [ClientRpc]
