@@ -71,11 +71,8 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         dragObject.transform.rotation = Quaternion.identity;
     }
 
-
     public override void OnMouseDown()
     {
-        //base.OnMouseDown();//位置同步异常竟是权限引发的
-
         CmdGet(Contents);
     }
 
@@ -116,23 +113,24 @@ public abstract class ContainerObj : OutLineObj, IAttachable
 
     public void OnMouseDrag()
     {
-        CmdDrag();
+        //服务端要使用的是当前客户端的鼠标位置，而非服务端的鼠标位置
+        CmdDrag(Input.mousePosition);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdDrag()
+    public void CmdDrag(Vector3 mousePos)
     {
-        CurrentDragObj?.OnMouseDrag();
+        CurrentDragObj?.Drag(mousePos);
     }
 
     public void OnMouseUp()
     {
-        CmdMouseUp();
+        CmdMouseUp(Input.mousePosition);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseUp()
+    public void CmdMouseUp(Vector3 mousePos)
     {
-        CurrentDragObj?.OnMouseUp();
+        CurrentDragObj?.MouseUp(mousePos);
     }
 }

@@ -91,25 +91,34 @@ public abstract class DragObject : OutLineObj
 
     public void OnMouseDrag()
     {
-        if(m_dragState.Value != DragObjState.Moving)
+        Drag(Input.mousePosition);
+    }
+
+    public void Drag(Vector3 screenPos)
+    {
+        if (m_dragState.Value != DragObjState.Moving)
         {
             return;
         }
 
         Vector3 hitPos;
-        if(Vector3Utils.GetClosetPoint(Input.mousePosition, transform.position, out hitPos))
+        if (Vector3Utils.GetClosetPoint(screenPos, transform.position, out hitPos))
         {
-            //Debug.Log("GetClosetPoint");
             var yOffset = new Vector3(0, m_collider.bounds.center.y - m_collider.bounds.min.y, 0);
             transform.position = hitPos + yOffset;
         }
         else
         {
-            transform.position = Vector3Utils.GetPlaneInteractivePoint(Input.mousePosition, transform.position.y);
+            transform.position = Vector3Utils.GetPlaneInteractivePoint(screenPos, transform.position.y);
         }
     }
 
     public void OnMouseUp()
+    {
+
+    }
+
+    public void MouseUp(Vector3 screenPos)
     {
         if (m_dragState.Value != DragObjState.Moving)
         {
@@ -122,10 +131,10 @@ public abstract class DragObject : OutLineObj
         m_collider.isTrigger = false;
         ChangeLayer("Raycast");
 
-        Vector3 lastPoint = Vector3Utils.GetPlaneInteractivePoint(Input.mousePosition, transform.position.y);
+        Vector3 lastPoint = Vector3Utils.GetPlaneInteractivePoint(screenPos, transform.position.y);
         Vector3 targetForceVector = lastPoint - transform.position;
 
-        if (RaycastContanier())
+        if (RaycastContanier(screenPos))
         {
 
         }
@@ -136,9 +145,9 @@ public abstract class DragObject : OutLineObj
         }
     }
 
-    protected virtual bool RaycastContanier()
+    protected virtual bool RaycastContanier(Vector3 screenPos)
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(screenPos);
         RaycastHit[] hits = Physics.RaycastAll(ray);
         foreach (RaycastHit hit in hits)
         {
