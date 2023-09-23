@@ -17,7 +17,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     [EnableIf("CountUnlimitedToggle")]
     public GameObject CountUnlimitedPrefab;
 
-    public DragObject currentDragObj = null;
+    public DragObject CurrentDragObj = null;
 
     public override void OnStartServer()
     {
@@ -57,6 +57,21 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         Add(dragObject);
     }
 
+    public void Add(DragObject dragObject)
+    {
+        if (!ContainTypes.Contains(dragObject.GetType()) || !AddCondition(dragObject))
+        {
+            print("该容器不装载此物体");
+            return;
+        }
+
+        Contents.Add(dragObject);
+        dragObject.gameObject.SetActive(false);
+        dragObject.transform.position = this.transform.position + Vector3.up * 10f;
+        dragObject.transform.rotation = Quaternion.identity;
+    }
+
+
     public override void OnMouseDown()
     {
         //base.OnMouseDown();//位置同步异常竟是权限引发的
@@ -74,8 +89,8 @@ public abstract class ContainerObj : OutLineObj, IAttachable
                 var go = Instantiate(CountUnlimitedPrefab,
                     transform.position + Vector3.up * 10f, Quaternion.identity);
                 NetworkServer.Spawn(go, connectionToClient);
-                currentDragObj = go.GetComponent<DragObject>();
-                RpcAfterGenerateHandler(currentDragObj);
+                CurrentDragObj = go.GetComponent<DragObject>();
+                RpcAfterGenerateHandler(CurrentDragObj);
             }
             else
             {
@@ -85,12 +100,12 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         }
         else
         {
-            currentDragObj = contents[contents.Count - 1];
+            CurrentDragObj = contents[contents.Count - 1];
             contents.RemoveAt(contents.Count - 1);
         }
 
-        currentDragObj.OnMouseDown();
-        currentDragObj.gameObject.SetActive(true);
+        CurrentDragObj.OnMouseDown();
+        CurrentDragObj.gameObject.SetActive(true);
     }
 
     [ClientRpc]
@@ -99,20 +114,17 @@ public abstract class ContainerObj : OutLineObj, IAttachable
 
     }
 
-
-    public void Add(DragObject dragObject)
+    public void OnMouseDrag()
     {
-        if (!ContainTypes.Contains(dragObject.GetType()) || !AddCondition(dragObject))
-        {
-            print("该容器不装载此物体");
-            return;
-        }
-
-        Contents.Add(dragObject);
-        dragObject.gameObject.SetActive(false);
-        dragObject.transform.position = this.transform.position + Vector3.up * 10f;
-        dragObject.transform.rotation = Quaternion.identity;
+        CmdDrag();
     }
+
+    [Command(requiresAuthority = false)]
+    public void CmdDrag()
+    {
+        CurrentDragObj?.OnMouseDrag();
+    }
+
 
     ///// <summary>
     ///// ///****************************************
@@ -124,14 +136,6 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     //    base.OnMouseDown();
     //    CmdMouseDown();
     //    //m_currentDragObj?.OnMouseDown();
-    //}
-
-    //[Command]
-    //public void CmdMouseDown()
-    //{
-    //    m_currentNetId = Get().netId;
-
-    //    //NetworkIdentity.s.TryGetValue(netId, out identity);
     //}
 
     //public void OnMouseDrag()

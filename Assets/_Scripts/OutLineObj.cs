@@ -31,11 +31,11 @@ public class OutLineObj : NetworkBehaviour
 
 
     /// <summary>
-    /// 操作前获取权限
+    /// 操作前获取权限--位置同步异常竟是权限引发的
     /// </summary>
     public virtual void OnMouseDown()
     {
-         NetworkClient.localPlayer.GetComponent<Player>().GetAuthority(gameObject);
+        //NetworkClient.localPlayer.GetComponent<Player>().GetAuthority(gameObject);
 
     }
 
