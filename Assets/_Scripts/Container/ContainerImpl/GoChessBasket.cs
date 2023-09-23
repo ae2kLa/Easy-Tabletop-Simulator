@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoChessBasket : ContainerObj<GoChessPiece>
+public class GoChessBasket : ContainerObj
 {
     public GoChessColor ContainGoChessColor = GoChessColor.White;
 
@@ -24,7 +24,7 @@ public class GoChessBasket : ContainerObj<GoChessPiece>
         }
     }
 
-    protected override void AfterGenerateHandler(DragObject dragObj)
+    protected override void RpcAfterGenerateHandler(DragObject dragObj)
     {
         if (dragObj is GoChessPiece)
         {

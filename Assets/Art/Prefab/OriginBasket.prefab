@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7716788680945053824}
   - component: {fileID: 2073687875925808896}
   - component: {fileID: 6260573803434961443}
-  - component: {fileID: 6757020240490986129}
+  - component: {fileID: 318519460730740174}
   m_Layer: 6
   m_Name: model
   m_TagString: Untagged
@@ -84,8 +84,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6757020240490986129
-BoxCollider:
+--- !u!64 &318519460730740174
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -94,9 +94,10 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 3.9264185, y: 3.6809864, z: 2.547714}
-  m_Center: {x: 0, y: -0.00000059604656, z: 1.2738569}
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 1839068501714707124, guid: 16c86840ae4c966468a9367a1b0f1366, type: 3}
 --- !u!1 &4216507164818058244
 GameObject:
   m_ObjectHideFlags: 0
@@ -167,8 +168,10 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  Contents: []
   CountUnlimitedToggle: 1
   CountUnlimitedPrefab: {fileID: 3670288201562288436, guid: 341564e58c97a474fa80f7390c7b7618, type: 3}
+  currentDragObj: {fileID: 0}
   ContainGoChessColor: 1
 --- !u!114 &3910640964075753808
 MonoBehaviour:

@@ -3,13 +3,11 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
 using UnityEngine;
 
-public abstract class ContainerObj<T> : OutLineObj, IAttachable where T : DragObject
+public abstract class ContainerObj : OutLineObj, IAttachable
 {
-    public readonly SyncList<DragObject> m_contents = new SyncList<DragObject>();
+    public List<DragObject> Contents = new List<DragObject>();
 
     protected List<Type> ContainTypes = new List<Type>();
 
@@ -19,6 +17,7 @@ public abstract class ContainerObj<T> : OutLineObj, IAttachable where T : DragOb
     [EnableIf("CountUnlimitedToggle")]
     public GameObject CountUnlimitedPrefab;
 
+    public DragObject currentDragObj = null;
 
     public override void OnStartServer()
     {
@@ -30,23 +29,19 @@ public abstract class ContainerObj<T> : OutLineObj, IAttachable where T : DragOb
     protected override void Init()
     {
         base.Init();
+
         AddContainTypes();
 
-        foreach(var subClassType in ContainTypes)
+        foreach (var subClassType in ContainTypes)
         {
             DragObject dragObject = null;
             if (CountUnlimitedPrefab.TryGetComponent<DragObject>(out dragObject))
             {
-                if(!dragObject.GetType().Equals(subClassType))
+                if (!dragObject.GetType().Equals(subClassType))
                 {
                     Debug.LogError($"CountUnlimitedPrefab不挂载{subClassType.Name}");
                 }
             }
-        }
-
-        for(int i = 0; i < 1; i++)
-        {
-            SupplySingleContent();
         }
     }
 
@@ -55,13 +50,57 @@ public abstract class ContainerObj<T> : OutLineObj, IAttachable where T : DragOb
     /// </summary>
     protected abstract void AddContainTypes();
 
+    protected abstract bool AddCondition(DragObject dragObj);
+
     public void Attach(DragObject dragObject)
     {
-        CmdAdd(dragObject);
+        Add(dragObject);
     }
 
-    [Command]
-    public void CmdAdd(DragObject dragObject)
+    public override void OnMouseDown()
+    {
+        //base.OnMouseDown();//位置同步异常竟是权限引发的
+
+        CmdGet(Contents);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdGet(List<DragObject> contents)
+    {
+        if (contents.Count == 0)
+        {
+            if (CountUnlimitedToggle)
+            {
+                var go = Instantiate(CountUnlimitedPrefab,
+                    transform.position + Vector3.up * 10f, Quaternion.identity);
+                NetworkServer.Spawn(go, connectionToClient);
+                currentDragObj = go.GetComponent<DragObject>();
+                RpcAfterGenerateHandler(currentDragObj);
+            }
+            else
+            {
+                print("容器是空的");
+                return;
+            }
+        }
+        else
+        {
+            currentDragObj = contents[contents.Count - 1];
+            contents.RemoveAt(contents.Count - 1);
+        }
+
+        currentDragObj.OnMouseDown();
+        currentDragObj.gameObject.SetActive(true);
+    }
+
+    [ClientRpc]
+    protected virtual void RpcAfterGenerateHandler(DragObject dragObj)
+    {
+
+    }
+
+
+    public void Add(DragObject dragObject)
     {
         if (!ContainTypes.Contains(dragObject.GetType()) || !AddCondition(dragObject))
         {
@@ -69,91 +108,52 @@ public abstract class ContainerObj<T> : OutLineObj, IAttachable where T : DragOb
             return;
         }
 
-        m_contents.Add(dragObject);
-        dragObject.transform.position = new Vector3(0,0,0);
-        dragObject.transform.rotation = Quaternion.identity;
+        Contents.Add(dragObject);
         dragObject.gameObject.SetActive(false);
+        dragObject.transform.position = this.transform.position + Vector3.up * 10f;
+        dragObject.transform.rotation = Quaternion.identity;
     }
 
-    protected abstract bool AddCondition(DragObject dragObj);
+    ///// <summary>
+    ///// ///****************************************
+    ///// </summary>
+    //protected uint m_currentNetId = 0;
 
-    [Server]
-    public DragObject Get()
-    {
-        if (m_contents.Count == 0)
-        {
-            if (CountUnlimitedToggle)
-            {
-                SupplySingleContent();
-            }
-            else
-            {
-                return null;
-            }
-        }
+    //public override void OnMouseDown()
+    //{
+    //    base.OnMouseDown();
+    //    CmdMouseDown();
+    //    //m_currentDragObj?.OnMouseDown();
+    //}
 
-        print("List count:" + m_contents.Count);
-        var res = m_contents[m_contents.Count - 1];
-        m_contents.RemoveAt(m_contents.Count - 1);
-        res.gameObject.SetActive(true);
-        return res;
-    }
+    //[Command]
+    //public void CmdMouseDown()
+    //{
+    //    m_currentNetId = Get().netId;
 
-    /// <summary>
-    /// 补充GO
-    /// </summary>
-    [Server]
-    protected virtual void SupplySingleContent()
-    {
-        var go = Instantiate(CountUnlimitedPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        NetworkServer.Spawn(go, connectionToClient);
-        var dragObj = go.GetComponent<DragObject>();
-        AfterGenerateHandler(dragObj);
-        CmdAdd(dragObj);
-    }
-    protected abstract void AfterGenerateHandler(DragObject dragObj);
+    //    //NetworkIdentity.s.TryGetValue(netId, out identity);
+    //}
 
+    //public void OnMouseDrag()
+    //{
+    //    //m_currentDragObj?.OnMouseDrag();
+    //}
 
-    /// <summary>
-    /// ///****************************************
-    /// </summary>
-    protected uint m_currentNetId = 0;
+    //[Command]
+    //public void CmdMouseDrag()
+    //{
 
-    public override void OnMouseDown()
-    {
-        base.OnMouseDown();
-        CmdMouseDown();
-        //m_currentDragObj?.OnMouseDown();
-    }
+    //}
 
-    [Command]
-    public void CmdMouseDown()
-    {
-        m_currentNetId = Get().netId;
+    //public void OnMouseUp()
+    //{
+    //    //m_currentDragObj?.OnMouseUp();
+    //    CmdMouseUp();
+    //}
 
-        //NetworkIdentity.s.TryGetValue(netId, out identity);
-    }
-
-    public void OnMouseDrag()
-    {
-        //m_currentDragObj?.OnMouseDrag();
-    }
-
-    [Command]
-    public void CmdMouseDrag()
-    {
-
-    }
-
-    public void OnMouseUp()
-    {
-        //m_currentDragObj?.OnMouseUp();
-        CmdMouseUp();
-    }
-
-    [Command]
-    public void CmdMouseUp()
-    {
-        m_currentNetId = 0;
-    }
+    //[Command]
+    //public void CmdMouseUp()
+    //{
+    //    m_currentNetId = 0;
+    //}
 }

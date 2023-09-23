@@ -29,12 +29,13 @@ public class OutLineObj : NetworkBehaviour
             m_outline.enabled = false;
     }
 
+
+    /// <summary>
+    /// 操作前获取权限
+    /// </summary>
     public virtual void OnMouseDown()
     {
-        if (!isOwned)
-        {
-            NetworkClient.localPlayer.GetComponent<Player>().GetAuthority(gameObject);
-        }
+         NetworkClient.localPlayer.GetComponent<Player>().GetAuthority(gameObject);
 
     }
 
