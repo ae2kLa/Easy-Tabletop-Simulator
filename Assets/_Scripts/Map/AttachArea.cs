@@ -6,6 +6,14 @@ using UnityEngine;
 
 public class AttachArea : OutLineObj, IAttachable
 {
+    /// <summary>
+    /// 属于哪个Grids
+    /// </summary>
+    public EasyGrid<GridData> Grids;
+
+    /// <summary>
+    /// 该格对应哪个GridData
+    /// </summary>
     public GridData Grid;
 
     public override void OnStartServer()
@@ -24,15 +32,103 @@ public class AttachArea : OutLineObj, IAttachable
         if (Grid.Occupied) return;
 
         Grid.Occupied = true;
-        Grid.OccupiedGO = dragObject.gameObject;
+        Grid.DragObject = dragObject;
+
         StartCoroutine(dragObject.ApplyAttachTransform(transform, () =>
         {
             var rb = dragObject.transform.GetComponent<Rigidbody>();
             rb.constraints = RigidbodyConstraints.FreezeAll;
             rb.freezeRotation = true;
-        }));
 
-        //TODO:在此判断胜负
+            if(dragObject is GoChessPiece)
+                CheckWin((dragObject as GoChessPiece).VirtualColor.Value);
+        }));
     }
 
+    /// <summary>
+    /// 每次仅按“放射状”检测“以本格为中心的局部9x9”即可
+    /// </summary>
+    private void CheckWin(GoChessColor color)
+    {
+        var centerPos = new Vector2Int(Grid.X, Grid.Z);
+
+        bool res =
+        CheckSingleLine(centerPos, new Vector2Int(1, -1), color) || 
+        CheckSingleLine(centerPos, new Vector2Int(0, -1), color) ||
+        CheckSingleLine(centerPos, new Vector2Int(-1, -1), color) ||
+        CheckSingleLine(centerPos, new Vector2Int(1, 0), color);
+
+        if(res)
+        {
+            print("检测到五子连成一线");
+        }
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="centerPos"></param>
+    /// <param name="direction"></param>
+    /// <param name=""></param>
+    private bool CheckSingleLine(Vector2Int centerPos, Vector2Int direction, GoChessColor color)
+    {
+        var startPos = centerPos - direction * 4;
+        var endPos = centerPos + direction;
+
+        //起点坐标不得越界
+        while (startPos.x < 0 || startPos.x >= Grids.Width)
+        {
+            startPos += direction;
+        }
+        while (startPos.y < 0 || startPos.y >= Grids.Height)
+        {
+            startPos += direction;
+        }
+
+        //print("startPos:" + startPos);
+        //print("endPos:" + endPos);
+
+        while (startPos.x != endPos.x || startPos.y != endPos.y)
+        {
+            var x = startPos.x;
+            var y = startPos.y;
+            var xOffset = direction.x;
+            var yOffset = direction.y;
+
+            bool lineDone = true;
+            //print("*************************************************************");
+            for (int i = 0; i < 5; i++, x += xOffset, y += yOffset)
+            {
+                //print("x, y:" + x + " " + y);
+                //不得越界
+                if (x < 0 || x >= Grids.Width || y < 0 || y >= Grids.Height ||
+                   !Grids[x, y].Occupied)
+                {
+                    lineDone = false;
+                    break;
+                }
+
+                //判断颜色
+                if (Grids[x, y].DragObject is GoChessPiece)
+                {
+                    var piece = Grids[x, y].DragObject as GoChessPiece;
+                    if(piece.VirtualColor.Value != color)
+                    {
+                        lineDone = false;
+                        break;
+                    }
+                }
+            }
+            if (lineDone)
+                return true;
+            //print("*************************************************************");
+
+            startPos += direction;
+        }
+
+        return false;
+    }
+
+    
 }

@@ -13,7 +13,7 @@ public enum GoChessColor
 public class GoChessPiece : DragObject
 {
     //ºÚ°×Á½·½
-    public BindableProperty<GoChessColor>  VirtualColor;
+    public BindableProperty<GoChessColor> VirtualColor;
 
     public Material WhiteMaterial;
     public Material BlackMaterial;

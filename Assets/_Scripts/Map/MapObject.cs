@@ -58,6 +58,7 @@ public class MapObject : NetworkBehaviour
             //客户端无需生成
             //NetworkServer.Spawn(attachArea, connectionToClient);
 
+            attachArea.GetComponent<AttachArea>().Grids = this.Grids;
             attachArea.GetComponent<AttachArea>().Grid = m_grids[x, z];
         });
     }

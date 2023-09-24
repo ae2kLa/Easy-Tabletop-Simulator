@@ -19,7 +19,7 @@ public class GridData
     /// <summary>
     /// 吸附在上面的物体
     /// </summary>
-    public GameObject OccupiedGO;
+    public DragObject DragObject;
 
     /// <summary>
     /// 当前格对应的局部坐标
