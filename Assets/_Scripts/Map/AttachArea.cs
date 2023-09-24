@@ -16,6 +16,8 @@ public class AttachArea : OutLineObj, IAttachable
     /// </summary>
     public GridData Grid;
 
+    public MapObject Map;
+
     public override void OnStartServer()
     {
         Init();
@@ -34,21 +36,55 @@ public class AttachArea : OutLineObj, IAttachable
         Grid.Occupied = true;
         Grid.DragObject = dragObject;
 
-        StartCoroutine(dragObject.ApplyAttachTransform(transform, () =>
+        //TODO:这个方法届时当下沉到子类
+        var piece = dragObject as GoChessPiece;
+        if (piece is null)
         {
-            var rb = dragObject.transform.GetComponent<Rigidbody>();
+            print($"所拖拽物体并非围棋棋子");
+            return;
+        }
+        else if (piece.VirtualColor.Value != Map.CurrentColor)
+        {
+            if (Map.CurrentColor == GoChessColor.Black)
+                print($"当前是黑子回合，白子落子无效");
+            else
+                print($"当前是白子回合，黑子落子无效");
+
+            //TODO:落子无效时自动将棋子移到一遍
+
+
+
+            return;
+        }
+
+        StartCoroutine(piece.ApplyAttachTransform(transform, () =>
+        {
+            var rb = piece.transform.GetComponent<Rigidbody>();
             rb.constraints = RigidbodyConstraints.FreezeAll;
             rb.freezeRotation = true;
 
-            if(dragObject is GoChessPiece)
-                CheckWin((dragObject as GoChessPiece).VirtualColor.Value);
+            //TODO:这个方法届时当下沉到子类
+            if(CheckWin(piece.VirtualColor.Value))
+            {
+                print("检测到五子连成一线");
+                return;
+            }
+
+            if(Map.CurrentColor == GoChessColor.Black)
+            {
+                Map.CurrentColor = GoChessColor.White;
+            }
+            else
+            {
+                Map.CurrentColor = GoChessColor.Black;
+            }
         }));
     }
 
     /// <summary>
     /// 每次仅按“放射状”检测“以本格为中心的局部9x9”即可
     /// </summary>
-    private void CheckWin(GoChessColor color)
+    private bool CheckWin(GoChessColor color)
     {
         var centerPos = new Vector2Int(Grid.X, Grid.Z);
 
@@ -58,11 +94,7 @@ public class AttachArea : OutLineObj, IAttachable
         CheckSingleLine(centerPos, new Vector2Int(-1, -1), color) ||
         CheckSingleLine(centerPos, new Vector2Int(1, 0), color);
 
-        if(res)
-        {
-            print("检测到五子连成一线");
-        }
-
+        return res;
     }
 
     /// <summary>

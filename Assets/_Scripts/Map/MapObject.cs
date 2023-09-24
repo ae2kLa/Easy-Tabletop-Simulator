@@ -33,6 +33,9 @@ public class MapObject : NetworkBehaviour
 
     protected Transform AttachParent;
 
+    //TODO:这个字段届时当下沉到子类
+    public GoChessColor CurrentColor;
+
     public override void OnStartServer()
     {
         if (AttachParent == null)
@@ -42,6 +45,7 @@ public class MapObject : NetworkBehaviour
         }
 
         MapInit();
+        CurrentColor = GoChessColor.Black;
         ServerStarted = true;
     }
 
@@ -53,13 +57,15 @@ public class MapObject : NetworkBehaviour
         m_grids.ForEach((x, z, _) =>
         {
             m_grids[x, z] = new GridData(x, z, transform, offset, gridSize);
-            var attachArea = GameObject.Instantiate(AttachPrefab, m_grids[x, z].WorldPos, Quaternion.identity, AttachParent);
+            var attachAreaGO = GameObject.Instantiate(AttachPrefab, m_grids[x, z].WorldPos, Quaternion.identity, AttachParent);
 
             //客户端无需生成
             //NetworkServer.Spawn(attachArea, connectionToClient);
 
-            attachArea.GetComponent<AttachArea>().Grids = this.Grids;
-            attachArea.GetComponent<AttachArea>().Grid = m_grids[x, z];
+            var attachArea = attachAreaGO.GetComponent<AttachArea>();
+            attachArea.Grids = this.Grids;
+            attachArea.Grid = m_grids[x, z];
+            attachArea.Map = this;
         });
     }
 
