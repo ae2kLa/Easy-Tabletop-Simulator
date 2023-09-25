@@ -65,6 +65,8 @@ public class AttachArea : OutLineObj, IAttachable
             if(CheckWin(piece.VirtualColor.Value))
             {
                 PlayerManager.Instance.SendAllMsg("检测到五子连成一线");
+
+                //TODO:清空棋盘，重新开始
                 return;
             }
 
@@ -150,8 +152,18 @@ public class AttachArea : OutLineObj, IAttachable
                     }
                 }
             }
+
+            //自动高亮并返回True。(TODO)更好的做法是out一个List供外部使用，而不是在算法里写业务逻辑
             if (lineDone)
+            {
+                x = startPos.x;
+                y = startPos.y;
+                for (int i = 0; i < 5; i++, x += xOffset, y += yOffset)
+                {
+                    Grids[x, y].DragObject.RpcFreezeHighlight(Color.green);
+                }
                 return true;
+            }
             //print("*************************************************************");
 
             startPos += direction;
@@ -159,6 +171,7 @@ public class AttachArea : OutLineObj, IAttachable
 
         return false;
     }
+
 
     
 }
