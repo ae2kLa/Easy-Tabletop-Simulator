@@ -20,6 +20,7 @@ public class GoChessPiece : DragObject
 
     protected override void Init()
     {
+        print("Piece Init");
         base.Init();
 
         VirtualColor = new BindableProperty<GoChessColor>();
@@ -35,6 +36,17 @@ public class GoChessPiece : DragObject
                 transform.Find("model").GetComponent<MeshRenderer>().material = BlackMaterial;
             }
         });
+    }
+
+    protected override bool CheckHandleAddition(uint playerNid)
+    {
+        bool res = false;
+        PlayerManager.Instance.ForEach((player) =>
+        {
+            if (player.netId == playerNid && player.CurrentColor == VirtualColor.Value)
+                res = true;
+        });
+        return res;
     }
 
 

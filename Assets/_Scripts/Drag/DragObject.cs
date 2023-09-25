@@ -1,14 +1,10 @@
 using Mirror;
 using QFramework;
-using Sirenix.OdinInspector;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using Tabletop;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public enum DragObjState
 {
@@ -77,14 +73,30 @@ public abstract class DragObject : OutLineObj
         m_dragState = new BindableProperty<DragObjState>(DragObjState.Available);
     }
 
+    /// <summary>
+    /// 为真时可以操作
+    /// </summary>
+    /// <returns></returns>
+    [Server]
+    protected virtual bool CheckHandleAddition(uint playerNid)
+    {
+        return false;
+    }
+
     public override void OnMouseDown()
     {
-        CmdMouseDown();
+        CmdMouseDown(NetworkClient.localPlayer.netId);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseDown()
+    public void CmdMouseDown(uint playerNid)
     {
+        if (!CheckHandleAddition(playerNid))
+        {
+            print("你不能使用对方的棋子");
+            return;
+        }
+
         MouseDown();
     }
 
@@ -104,12 +116,17 @@ public abstract class DragObject : OutLineObj
 
     public void OnMouseDrag()
     {
-        CmdMouseDrag(Input.mousePosition);
+        CmdMouseDrag(NetworkClient.localPlayer.netId, Input.mousePosition);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseDrag(Vector3 screenPos)
+    public void CmdMouseDrag(uint playerNid, Vector3 screenPos)
     {
+        if (!CheckHandleAddition(playerNid))
+        {
+            print("你不能使用对方的棋子");
+            return;
+        }
         MouseDrag(screenPos);
     }
 
@@ -134,12 +151,17 @@ public abstract class DragObject : OutLineObj
 
     public void OnMouseUp()
     {
-        CmdMouseUp(Input.mousePosition);
+        CmdMouseUp(NetworkClient.localPlayer.netId, Input.mousePosition);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseUp(Vector3 mousePos)
+    public void CmdMouseUp(uint playerNid, Vector3 mousePos)
     {
+        if (!CheckHandleAddition(playerNid))
+        {
+            print("你不能使用对方的棋子");
+            return;
+        }
         MouseUp(mousePos);
     }
 
