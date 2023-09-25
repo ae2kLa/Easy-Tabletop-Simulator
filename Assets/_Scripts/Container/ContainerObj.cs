@@ -1,4 +1,5 @@
 using Mirror;
+using QFramework;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -7,13 +8,14 @@ using UnityEngine;
 
 public abstract class ContainerObj : OutLineObj, IAttachable
 {
-    public List<DragObject> Contents = new List<DragObject>();
+    protected Collider m_collider;
+    public Collider Collider => m_collider;
 
+    public List<DragObject> Contents = new List<DragObject>();
     protected List<Type> ContainTypes = new List<Type>();
 
     [ToggleLeft]
     public bool CountUnlimitedToggle = false;
-
     [EnableIf("CountUnlimitedToggle")]
     public GameObject CountUnlimitedPrefab;
 
@@ -29,6 +31,8 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     protected override void Init()
     {
         base.Init();
+
+        m_collider = transform.Find("model").GetComponent<Collider>();
 
         AddContainTypes();
 
@@ -85,6 +89,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
                     transform.position + Vector3.up * 10f, Quaternion.identity);
                 NetworkServer.Spawn(go, connectionToClient);
                 CurrentDragObj = go.GetComponent<DragObject>();
+                CurrentDragObj.Container = this;
                 RpcAfterGenerateHandler(CurrentDragObj);
             }
             else

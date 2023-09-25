@@ -31,6 +31,8 @@ public abstract class DragObject : OutLineObj
 
     protected BindableProperty<DragObjState> m_dragState;
 
+    public ContainerObj Container;
+
     public void SetDragState(DragObjState targetState)
     {
         m_dragState.Value = targetState;
@@ -195,7 +197,7 @@ public abstract class DragObject : OutLineObj
     }
 
     [Server]
-    public virtual IEnumerator ApplyAttachTransform(Transform attachTrans, UnityAction callback)
+    public virtual IEnumerator ApplyAttachTransform(Transform attachTrans, UnityAction callback = null)
     {
         #region 旧方法看起来不够灵活
         //Vector3 originPos = transform.position;
@@ -230,10 +232,41 @@ public abstract class DragObject : OutLineObj
         m_currentClone.DestroySelf();
         m_currentClone = null;
 
-        m_rigidbody.isKinematic = true;
+        m_rigidbody.isKinematic = false;
         m_collider.isTrigger = false;
 
         if(callback != null)
+            callback();
+    }
+
+    [Server]
+    public virtual IEnumerator RecycleDragObject(UnityAction callback = null)
+    {
+        m_dragState.Value = DragObjState.Freeze;
+        m_rigidbody.isKinematic = true;
+        m_collider.isTrigger = true;
+        m_currentClone.DestroySelf();
+        m_currentClone = null;
+
+        //插值应用坐标
+        Vector3 targetPos = Container.transform.position + new Vector3(0, 1f, 0);
+        while (Vector3.Distance(transform.position, targetPos) >= 0.01f)
+        {
+            yield return null;
+            transform.position = Vector3.Lerp(transform.position, targetPos, 0.05f);
+        }
+        transform.position = targetPos;
+
+        //重置一些状态变量
+        m_dragState.Value = DragObjState.Available;
+
+        m_rigidbody.isKinematic = false;
+        m_collider.isTrigger = false;
+
+        //自动放回棋篓
+        Container.Attach(this);
+
+        if (callback != null)
             callback();
     }
 

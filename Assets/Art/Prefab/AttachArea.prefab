@@ -134,6 +134,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  Map: {fileID: 0}
 --- !u!114 &-4359007385487166006
 MonoBehaviour:
   m_ObjectHideFlags: 0

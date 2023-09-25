@@ -31,11 +31,6 @@ public class AttachArea : OutLineObj, IAttachable
     [Server]
     public void Attach(DragObject dragObject)
     {
-        if (Grid.Occupied) return;
-
-        Grid.Occupied = true;
-        Grid.DragObject = dragObject;
-
         //TODO:这个方法届时当下沉到子类
         var piece = dragObject as GoChessPiece;
         if (piece is null)
@@ -45,17 +40,20 @@ public class AttachArea : OutLineObj, IAttachable
         }
         else if (piece.VirtualColor.Value != Map.CurrentColor)
         {
+            //TODO:RPC通知对应客户端，显示POP-UI提示
             if (Map.CurrentColor == GoChessColor.Black)
                 print($"当前是黑子回合，白子落子无效");
             else
                 print($"当前是白子回合，黑子落子无效");
 
-            //TODO:落子无效时自动将棋子移到一遍
-
-
-
+            //落子无效时自动将棋子移回棋篓
+            StartCoroutine(piece.RecycleDragObject());
             return;
         }
+
+        if (Grid.Occupied) return;
+        Grid.Occupied = true;
+        Grid.DragObject = dragObject;
 
         StartCoroutine(piece.ApplyAttachTransform(transform, () =>
         {
