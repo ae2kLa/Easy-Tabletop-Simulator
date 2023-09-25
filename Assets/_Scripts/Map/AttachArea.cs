@@ -29,25 +29,25 @@ public class AttachArea : OutLineObj, IAttachable
     }
 
     [Server]
-    public void Attach(DragObject dragObject)
+    public void Attach(uint playerNid, DragObject dragObject)
     {
         //TODO:这个方法届时当下沉到子类
         var piece = dragObject as GoChessPiece;
         if (piece is null)
         {
-            print($"所拖拽物体并非围棋棋子");
+            PlayerManager.Instance.SendMsg(playerNid, $"所拖拽物体并非围棋棋子");
             return;
         }
         else if (piece.VirtualColor.Value != Map.CurrentColor)
         {
             //TODO:RPC通知对应客户端，显示POP-UI提示
             if (Map.CurrentColor == GoChessColor.Black)
-                print($"当前是黑子回合，白子落子无效");
+                PlayerManager.Instance.SendMsg(playerNid, $"当前是黑子回合，白子落子无效");
             else
-                print($"当前是白子回合，黑子落子无效");
+                PlayerManager.Instance.SendMsg(playerNid, $"当前是白子回合，黑子落子无效");
 
             //落子无效时自动将棋子移回棋篓
-            StartCoroutine(piece.RecycleDragObject());
+            StartCoroutine(piece.RecycleDragObject(playerNid));
             return;
         }
 
@@ -64,7 +64,7 @@ public class AttachArea : OutLineObj, IAttachable
             //TODO:这个方法届时当下沉到子类
             if(CheckWin(piece.VirtualColor.Value))
             {
-                print("检测到五子连成一线");
+                PlayerManager.Instance.SendAllMsg("检测到五子连成一线");
                 return;
             }
 

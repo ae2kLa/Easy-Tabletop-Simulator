@@ -47,33 +47,39 @@ public class Player : NetworkBehaviour
             m_currentColor = GoChessColor.White;
     }
 
-
-    public void GetAuthority(GameObject targetGo)
+    [TargetRpc]
+    public void TargetSendMsg(NetworkConnectionToClient targetConn, string msg)
     {
-        if (!isLocalPlayer) return;
-
-        if(targetGo == null)
-        {
-            Debug.LogWarning("目标对象为空");
-            return;
-        }
-
-        var id = targetGo.GetComponent<NetworkIdentity>();
-
-        if(id == null)
-        {
-            Debug.LogWarning("目标脚本为空");
-            return;
-        }
-
-        CmdAuthority(id, connectionToClient);
+        Debug.Log(msg);
     }
 
-    [Command]
-    protected void CmdAuthority(NetworkIdentity id, NetworkConnectionToClient connClient)
-    {
-        id.RemoveClientAuthority();
-        id.AssignClientAuthority(connClient);
-    }
+
+    //public void GetAuthority(GameObject targetGo)
+    //{
+    //    if (!isLocalPlayer) return;
+
+    //    if(targetGo == null)
+    //    {
+    //        Debug.LogWarning("目标对象为空");
+    //        return;
+    //    }
+
+    //    var id = targetGo.GetComponent<NetworkIdentity>();
+
+    //    if(id == null)
+    //    {
+    //        Debug.LogWarning("目标脚本为空");
+    //        return;
+    //    }
+
+    //    CmdAuthority(id, connectionToClient);
+    //}
+
+    //[Command]
+    //protected void CmdAuthority(NetworkIdentity id, NetworkConnectionToClient connClient)
+    //{
+    //    id.RemoveClientAuthority();
+    //    id.AssignClientAuthority(connClient);
+    //}
 
 }

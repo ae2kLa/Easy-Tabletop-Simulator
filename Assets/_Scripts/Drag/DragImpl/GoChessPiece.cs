@@ -20,7 +20,6 @@ public class GoChessPiece : DragObject
 
     protected override void Init()
     {
-        print("Piece Init");
         base.Init();
 
         VirtualColor = new BindableProperty<GoChessColor>();

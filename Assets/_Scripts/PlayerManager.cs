@@ -45,4 +45,23 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
+    public void SendMsg(uint playerNid, string msg)
+    {
+        ForEach((player) =>
+        {
+            if (player.netId == playerNid)
+            {
+                player.TargetSendMsg(player.connectionToClient, msg);
+            }
+        });
+    }
+    public void SendAllMsg(string msg)
+    {
+        ForEach((player) =>
+        {
+            player.TargetSendMsg(player.connectionToClient, msg);
+        });
+    }
+
+
 }

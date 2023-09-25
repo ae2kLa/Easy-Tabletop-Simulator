@@ -56,16 +56,16 @@ public abstract class ContainerObj : OutLineObj, IAttachable
 
     protected abstract bool AddCondition(DragObject dragObj);
 
-    public void Attach(DragObject dragObject)
+    public void Attach(uint playerNid, DragObject dragObject)
     {
-        Add(dragObject);
+        Add(playerNid, dragObject);
     }
 
-    public void Add(DragObject dragObject)
+    public void Add(uint playerNid, DragObject dragObject)
     {
         if (!ContainTypes.Contains(dragObject.GetType()) || !AddCondition(dragObject))
         {
-            print("该容器不装载此物体");
+            PlayerManager.Instance.SendMsg(playerNid, "该容器不装载此物体");
             return;
         }
 
@@ -93,7 +93,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     {
         if (!CheckHandleAddition(playerNid))
         {
-            print("你不能使用对方的棋篓");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
             return;
         }
 
@@ -110,7 +110,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
             }
             else
             {
-                print("容器是空的");
+                PlayerManager.Instance.SendMsg(playerNid, "容器是空的");
                 return;
             }
         }
@@ -141,7 +141,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     {
         if (!CheckHandleAddition(playerNid))
         {
-            print("你不能使用对方的棋篓");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
             return;
         }
         CurrentDragObj?.MouseDrag(mousePos);
@@ -157,9 +157,9 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     {
         if (!CheckHandleAddition(playerNid))
         {
-            print("你不能使用对方的棋篓");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
             return;
         }
-        CurrentDragObj?.MouseUp(mousePos);
+        CurrentDragObj?.MouseUp(playerNid, mousePos) ;
     }
 }

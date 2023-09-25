@@ -93,7 +93,7 @@ public abstract class DragObject : OutLineObj
     {
         if (!CheckHandleAddition(playerNid))
         {
-            print("你不能使用对方的棋子");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
 
@@ -124,7 +124,7 @@ public abstract class DragObject : OutLineObj
     {
         if (!CheckHandleAddition(playerNid))
         {
-            print("你不能使用对方的棋子");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
         MouseDrag(screenPos);
@@ -159,14 +159,14 @@ public abstract class DragObject : OutLineObj
     {
         if (!CheckHandleAddition(playerNid))
         {
-            print("你不能使用对方的棋子");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
-        MouseUp(mousePos);
+        MouseUp(playerNid, mousePos);
     }
 
     [Server]
-    public void MouseUp(Vector3 screenPos)
+    public void MouseUp(uint playerNid, Vector3 screenPos)
     {
         if (m_dragState.Value != DragObjState.Moving)
         {
@@ -182,9 +182,10 @@ public abstract class DragObject : OutLineObj
         Vector3 lastPoint = Vector3Utils.GetPlaneInteractivePoint(screenPos, transform.position.y);
         Vector3 targetForceVector = lastPoint - transform.position;
 
-        if (RaycastContanier(screenPos))
+        IAttachable attachObj = RaycastContanier(screenPos);
+        if (attachObj != null)
         {
-
+            attachObj.Attach(playerNid, this);
         }
         else
         {
@@ -194,7 +195,7 @@ public abstract class DragObject : OutLineObj
     }
 
     [Server]
-    protected virtual bool RaycastContanier(Vector3 screenPos)
+    protected IAttachable RaycastContanier(Vector3 screenPos)
     {
         Ray ray = Camera.main.ScreenPointToRay(screenPos);
         RaycastHit[] hits = Physics.RaycastAll(ray);
@@ -206,16 +207,14 @@ public abstract class DragObject : OutLineObj
             IAttachable attachObj = null;
             if (hitObjTrans.TryGetComponent<IAttachable>(out attachObj))
             {
-                attachObj.Attach(this);
-                return true;
+                return attachObj;
             }
             else if (hitObjTrans.parent != null && hitObjTrans.parent.TryGetComponent<IAttachable>(out attachObj))
             {
-                attachObj.Attach(this);
-                return true;
+                return attachObj;
             }
         }
-        return false;
+        return null;
     }
 
     [Server]
@@ -262,7 +261,7 @@ public abstract class DragObject : OutLineObj
     }
 
     [Server]
-    public virtual IEnumerator RecycleDragObject(UnityAction callback = null)
+    public virtual IEnumerator RecycleDragObject(uint playerNid, UnityAction callback = null)
     {
         m_dragState.Value = DragObjState.Freeze;
         m_rigidbody.isKinematic = true;
@@ -286,7 +285,7 @@ public abstract class DragObject : OutLineObj
         m_collider.isTrigger = false;
 
         //自动放回棋篓
-        Container.Attach(this);
+        Container.Attach(playerNid, this);
 
         if (callback != null)
             callback();
