@@ -2,6 +2,7 @@ using Mirror;
 using QFramework;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AttachArea : OutLineObj, IAttachable
@@ -67,9 +68,12 @@ public class AttachArea : OutLineObj, IAttachable
                 PlayerManager.Instance.SendAllMsg("检测到五子连成一线");
 
                 //TODO:清空棋盘，重新开始
+
+                Map.CurrentColor.Value = GoChessColor.Unknown;
                 return;
             }
 
+            //回合转换
             if(Map.CurrentColor.Value == GoChessColor.Black)
             {
                 Map.CurrentColor.Value = GoChessColor.White;

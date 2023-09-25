@@ -7,7 +7,8 @@ using UnityEngine;
 public enum GoChessColor
 {
     White = 0,
-    Black
+    Black,
+    Unknown
 }
 
 public class GoChessPiece : DragObject

@@ -42,13 +42,8 @@ public class OutLineObj : NetworkBehaviour
             m_outline.enabled = false;
     }
 
-
-    /// <summary>
-    /// 操作前获取权限--位置同步异常竟是权限引发的
-    /// </summary>
     public virtual void OnMouseDown()
     {
-        //NetworkClient.localPlayer.GetComponent<Player>().GetAuthority(gameObject);
 
     }
 
