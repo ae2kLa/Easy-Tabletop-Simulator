@@ -1,4 +1,5 @@
 using Mirror;
+using Mirror.Examples.Basic;
 using QFramework;
 using Sirenix.OdinInspector;
 using System;
@@ -35,7 +36,6 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         m_collider = transform.Find("model").GetComponent<Collider>();
 
         AddContainTypes();
-
         foreach (var subClassType in ContainTypes)
         {
             DragObject dragObject = null;
@@ -73,14 +73,30 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         Contents.Add(dragObject);
     }
 
+    /// <summary>
+    /// 为真时可以操作
+    /// </summary>
+    /// <returns></returns>
+    [Server]
+    protected virtual bool CheckHandleAddition(uint playerNid)
+    {
+        return false;
+    }
+
     public override void OnMouseDown()
     {
-        CmdGet();
+         CmdGet(NetworkClient.localPlayer.netId);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdGet()
+    public void CmdGet(uint playerNid)
     {
+        if (!CheckHandleAddition(playerNid))
+        {
+            print("你不能使用对方的棋篓");
+            return;
+        }
+
         if (Contents.Count == 0)
         {
             if (CountUnlimitedToggle)
@@ -117,23 +133,33 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     public void OnMouseDrag()
     {
         //服务端要使用的是客户端的鼠标位置，而非服务端的鼠标位置，OnMouseUp同
-        CmdMouseDrag(Input.mousePosition);
+        CmdMouseDrag(NetworkClient.localPlayer.netId, Input.mousePosition);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseDrag(Vector3 mousePos)
+    public void CmdMouseDrag(uint playerNid, Vector3 mousePos)
     {
+        if (!CheckHandleAddition(playerNid))
+        {
+            print("你不能使用对方的棋篓");
+            return;
+        }
         CurrentDragObj?.MouseDrag(mousePos);
     }
 
     public void OnMouseUp()
     {
-        CmdMouseUp(Input.mousePosition);
+        CmdMouseUp(NetworkClient.localPlayer.netId, Input.mousePosition);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseUp(Vector3 mousePos)
+    public void CmdMouseUp(uint playerNid, Vector3 mousePos)
     {
+        if (!CheckHandleAddition(playerNid))
+        {
+            print("你不能使用对方的棋篓");
+            return;
+        }
         CurrentDragObj?.MouseUp(mousePos);
     }
 }

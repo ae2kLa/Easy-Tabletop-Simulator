@@ -34,4 +34,16 @@ public class GoChessBasket : ContainerObj
             piece.VirtualColor.Value = ContainGoChessColor;
         }
     }
+
+    [Server]
+    protected override bool CheckHandleAddition(uint playerNid)
+    {
+        bool res = false;
+        PlayerManager.Instance.ForEach((player) =>
+        {
+            if (player.netId == playerNid && player.CurrentColor == ContainGoChessColor)
+                res = true;
+        });
+        return res;
+    }
 }
