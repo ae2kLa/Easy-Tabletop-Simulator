@@ -4,6 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 记录当前对局到哪一方回合
+/// </summary>
 public class MapObject : NetworkBehaviour
 {
     public GameObject AttachPrefab;
@@ -34,7 +37,7 @@ public class MapObject : NetworkBehaviour
     protected Transform AttachParent;
 
     //TODO:这个字段届时当下沉到子类
-    public GoChessColor CurrentColor;
+    public BindableProperty<GoChessColor> CurrentColor;
 
     public override void OnStartServer()
     {
@@ -45,7 +48,16 @@ public class MapObject : NetworkBehaviour
         }
 
         MapInit();
-        CurrentColor = GoChessColor.Black;
+        CurrentColor = new BindableProperty<GoChessColor>(GoChessColor.Black);
+        CurrentColor.RegisterWithInitValue((color) =>
+        {
+            //TODO:首回合还没能显示
+            PlayerManager.Instance.ForEach((player) =>
+            {
+                if (player.CurrentColor == color)
+                    PlayerManager.Instance.SendMsg(player.netId, $"现在到你的回合了");
+            });
+        });
         ServerStarted = true;
     }
 

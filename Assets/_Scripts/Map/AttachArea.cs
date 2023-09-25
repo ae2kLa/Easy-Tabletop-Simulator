@@ -38,10 +38,10 @@ public class AttachArea : OutLineObj, IAttachable
             PlayerManager.Instance.SendMsg(playerNid, $"所拖拽物体并非围棋棋子");
             return;
         }
-        else if (piece.VirtualColor.Value != Map.CurrentColor)
+        else if (piece.VirtualColor.Value != Map.CurrentColor.Value)
         {
             //TODO:RPC通知对应客户端，显示POP-UI提示
-            if (Map.CurrentColor == GoChessColor.Black)
+            if (Map.CurrentColor.Value == GoChessColor.Black)
                 PlayerManager.Instance.SendMsg(playerNid, $"当前是黑子回合，白子落子无效");
             else
                 PlayerManager.Instance.SendMsg(playerNid, $"当前是白子回合，黑子落子无效");
@@ -68,13 +68,13 @@ public class AttachArea : OutLineObj, IAttachable
                 return;
             }
 
-            if(Map.CurrentColor == GoChessColor.Black)
+            if(Map.CurrentColor.Value == GoChessColor.Black)
             {
-                Map.CurrentColor = GoChessColor.White;
+                Map.CurrentColor.Value = GoChessColor.White;
             }
             else
             {
-                Map.CurrentColor = GoChessColor.Black;
+                Map.CurrentColor.Value = GoChessColor.Black;
             }
         }));
     }

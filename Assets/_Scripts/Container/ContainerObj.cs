@@ -1,5 +1,4 @@
 using Mirror;
-using Mirror.Examples.Basic;
 using QFramework;
 using Sirenix.OdinInspector;
 using System;
