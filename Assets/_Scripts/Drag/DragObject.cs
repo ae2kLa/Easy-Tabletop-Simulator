@@ -93,7 +93,7 @@ public abstract class DragObject : OutLineObj
     {
         if (!CheckHandleAddition(playerNid))
         {
-            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
+            PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
 
@@ -124,7 +124,7 @@ public abstract class DragObject : OutLineObj
     {
         if (!CheckHandleAddition(playerNid))
         {
-            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
+            PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
         MouseDrag(screenPos);
@@ -159,7 +159,7 @@ public abstract class DragObject : OutLineObj
     {
         if (!CheckHandleAddition(playerNid))
         {
-            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
+            PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
         MouseUp(playerNid, mousePos);
@@ -263,6 +263,8 @@ public abstract class DragObject : OutLineObj
     [Server]
     public virtual IEnumerator RecycleDragObject(uint playerNid, UnityAction callback = null)
     {
+        //回收时取消高光显示
+        RpcCancelHighlight();
         m_dragState.Value = DragObjState.Freeze;
         m_rigidbody.isKinematic = true;
         m_collider.isTrigger = true;
@@ -312,6 +314,11 @@ public abstract class DragObject : OutLineObj
     public void RpcBeGet()
     {
         gameObject.SetActive(true);
+    }
+
+    public void Restart(uint playerNid)
+    {
+        StartCoroutine(RecycleDragObject(playerNid));
     }
 
 }

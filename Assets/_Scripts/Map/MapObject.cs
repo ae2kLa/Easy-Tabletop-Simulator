@@ -1,4 +1,5 @@
 using Mirror;
+using Mirror.Examples.Basic;
 using QFramework;
 using System.Collections;
 using System.Collections.Generic;
@@ -52,10 +53,10 @@ public class MapObject : NetworkBehaviour
         CurrentColor.RegisterWithInitValue((color) =>
         {
             //TODO:首回合还没能显示
-            PlayerManager.Instance.ForEach((player) =>
+            PlayManager.Instance.ForEach((player) =>
             {
                 if (player.CurrentColor == color)
-                    PlayerManager.Instance.SendMsg(player.netId, $"现在到你的回合了");
+                    PlayManager.Instance.SendMsg(player.netId, $"现在到你的回合了");
             });
         });
         ServerStarted = true;
@@ -78,6 +79,20 @@ public class MapObject : NetworkBehaviour
             attachArea.Grids = this.Grids;
             attachArea.Grid = m_grids[x, z];
             attachArea.Map = this;
+        });
+    }
+
+
+    public void RestartGame(uint playerNid)
+    {
+        m_grids.ForEach((x, z, grid) =>
+        {
+            grid.Occupied = false;
+            if(grid.DragObject != null)
+            {
+                grid.DragObject.Restart(playerNid);
+                grid.DragObject = null;
+            }
         });
     }
 

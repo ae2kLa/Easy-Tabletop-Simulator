@@ -8,10 +8,11 @@ using UnityEngine.Events;
 /// <summary>
 /// 仅服务器管理
 /// </summary>
-public class PlayerManager : NetworkBehaviour
+public class PlayManager : NetworkBehaviour
 {
-    public static PlayerManager Instance => m_instance;
-    public static PlayerManager m_instance = null;
+    public static PlayManager Instance => m_instance;
+    public static PlayManager m_instance = null;
+
     private List<Player> m_players;
 
     public override void OnStartServer()
@@ -55,12 +56,31 @@ public class PlayerManager : NetworkBehaviour
             }
         });
     }
+
     public void SendAllMsg(string msg)
     {
         ForEach((player) =>
         {
             player.TargetSendMsg(player.connectionToClient, msg);
         });
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            RestartGame();
+        }
+    }
+
+    public void RestartGame()
+    {
+        MapObject[] maps = GameObject.FindObjectsOfType<MapObject>();
+
+        foreach(var map in maps)
+        {
+            map.RestartGame(NetworkClient.localPlayer.netId);
+        }
     }
 
 

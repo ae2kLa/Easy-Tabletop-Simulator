@@ -16,7 +16,7 @@ public class Player : NetworkBehaviour
     {
         if (isServer)
         {
-            PlayerManager.Instance.Add(this);
+            PlayManager.Instance.Add(this);
             CmdGiveColor();
         }
     }
@@ -25,7 +25,7 @@ public class Player : NetworkBehaviour
     {
         if (isServer)
         {
-            PlayerManager.Instance.Remove(this);
+            PlayManager.Instance.Remove(this);
         }
     }
 
