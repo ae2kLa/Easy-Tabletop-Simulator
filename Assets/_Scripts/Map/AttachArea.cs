@@ -55,7 +55,6 @@ public class AttachArea : OutLineObj, IAttachable
         Grid.Occupied = true;
         Grid.DragObject = dragObject;
 
-        piece.SetDragState(DragObjState.Freeze);
         StartCoroutine(piece.ApplyAttachTransform(transform, () =>
         {
             var rb = piece.transform.GetComponent<Rigidbody>();

@@ -52,8 +52,6 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     protected abstract void AddContainTypes();
     protected abstract bool AddCondition(DragObject dragObj);
 
-
-    [Command(requiresAuthority = false)]
     public void Attach(uint playerNid, DragObject dragObject)
     {
         Add(playerNid, dragObject);

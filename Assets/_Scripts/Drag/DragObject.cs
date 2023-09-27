@@ -119,7 +119,6 @@ public abstract class DragObject : OutLineObj
         Vector3 hitPos;
         if (Vector3Utils.GetClosetPoint(Input.mousePosition, transform.position, out hitPos))
         {
-            print("OnMouseDrag hitPos");
             CmdMouseDrag(NetworkClient.localPlayer.netId, hitPos);
         }
     }
@@ -195,7 +194,6 @@ public abstract class DragObject : OutLineObj
         }
     }
 
-
     [Server]
     protected IAttachable RaycastContanier(Ray ray)
     {
@@ -236,6 +234,7 @@ public abstract class DragObject : OutLineObj
         #endregion
 
         //应用旋转
+        m_dragState.Value = DragObjState.Freeze;
         transform.rotation = attachTrans.rotation;
 
         //插值应用坐标
@@ -251,7 +250,6 @@ public abstract class DragObject : OutLineObj
         //重置一些状态变量
         m_currentClone.DestroySelf();
         m_currentClone = null;
-
         m_rigidbody.isKinematic = false;
         m_collider.isTrigger = false;
 
@@ -280,6 +278,7 @@ public abstract class DragObject : OutLineObj
         transform.position = targetPos;
 
         //重置一些状态变量
+        m_dragState.Value = DragObjState.Available;
         m_rigidbody.isKinematic = false;
         m_collider.isTrigger = false;
 
