@@ -15,6 +15,7 @@ public class GameController : NetworkBehaviour
         Init();
     }
 
+    [Server]
     protected void Init()
     {
         var bb = Instantiate(BlackBasket);

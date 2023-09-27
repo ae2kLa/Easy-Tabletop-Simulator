@@ -32,7 +32,7 @@ public static class Vector3Utils
     /// <param name="screenPosition"></param>
     /// <param name="plane"></param>
     /// <param name="camera"></param>
-    /// <returns>从摄像机向鼠标点击处投出射线，最近的碰撞点</returns>
+    /// <returns>从摄像机向鼠标点击处投出长射线，最近的碰撞点</returns>
     public static bool GetClosetPoint(Vector3 screenPosition, Vector3 worldPos, out Vector3 hitPos, Camera camera = null)
     {
         if (camera == null)

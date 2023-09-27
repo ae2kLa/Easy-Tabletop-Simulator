@@ -5,6 +5,7 @@ using System.Collections;
 using Tabletop;
 using UnityEngine;
 using UnityEngine.Events;
+using static UnityEditor.PlayerSettings;
 
 public enum DragObjState
 {
@@ -43,7 +44,7 @@ public abstract class DragObject : OutLineObj
     /// 拖动时更新的向量
     /// </summary>
     protected Vector3 m_currentVector;
-    
+
     /// <summary>
     /// 点击时更新的起始位置
     /// </summary>
@@ -96,108 +97,108 @@ public abstract class DragObject : OutLineObj
             PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
-
-        MouseDown();
+        MouseDown(PlayManager.Instance.GetConn(playerNid));
     }
 
-    public void MouseDown()
+    [Server]
+    public void MouseDown(NetworkConnectionToClient conn)
     {
         if (m_dragState.Value != DragObjState.Available)
         {
             return;
         }
-
-        m_dragState.Value = DragObjState.Moving;
         m_rigidbody.isKinematic = true;
         m_collider.isTrigger = true;
+        m_dragState.Value = DragObjState.Moving;
         ChangeLayer("IgnoreRaycast");
+        TargetChangeLayer(conn, "IgnoreRaycast");
     }
-
 
     public void OnMouseDrag()
     {
-        CmdMouseDrag(NetworkClient.localPlayer.netId, Input.mousePosition);
+        Vector3 hitPos;
+        if (Vector3Utils.GetClosetPoint(Input.mousePosition, transform.position, out hitPos))
+        {
+            print("OnMouseDrag hitPos");
+            CmdMouseDrag(NetworkClient.localPlayer.netId, hitPos);
+        }
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseDrag(uint playerNid, Vector3 screenPos)
+    public void CmdMouseDrag(uint playerNid, Vector3 hitPos)
     {
         if (!CheckHandleAddition(playerNid))
         {
             PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
-        MouseDrag(screenPos);
+        MouseDrag(hitPos);
     }
 
-    public void MouseDrag(Vector3 screenPos)
+    public void MouseDrag(Vector3 hitPos)
     {
         if (m_dragState.Value != DragObjState.Moving)
         {
             return;
         }
 
-        Vector3 hitPos;
-        if (Vector3Utils.GetClosetPoint(screenPos, transform.position, out hitPos))
-        {
-            var yOffset = new Vector3(0, m_collider.bounds.center.y - m_collider.bounds.min.y, 0);
-            transform.position = hitPos + yOffset;
-        }
-        else
-        {
-            transform.position = Vector3Utils.GetPlaneInteractivePoint(screenPos, transform.position.y);
-        }
+        var yOffset = new Vector3(0, m_collider.bounds.center.y - m_collider.bounds.min.y, 0);
+        transform.position = hitPos + yOffset;
+        //else
+        //{
+        //    //CmdSetPosition(Vector3Utils.GetPlaneInteractivePoint(screenPos, transform.position.y));
+        //}
     }
+
 
     public void OnMouseUp()
     {
-        CmdMouseUp(NetworkClient.localPlayer.netId, Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        CmdMouseUp(NetworkClient.localPlayer.netId, ray);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseUp(uint playerNid, Vector3 mousePos)
+    public void CmdMouseUp(uint playerNid, Ray ray)
     {
         if (!CheckHandleAddition(playerNid))
         {
             PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
-        MouseUp(playerNid, mousePos);
+        MouseUp(PlayManager.Instance.GetConn(playerNid), playerNid, ray);
     }
 
     [Server]
-    public void MouseUp(uint playerNid, Vector3 screenPos)
+    public void MouseUp(NetworkConnectionToClient conn, uint playerNid, Ray ray)
     {
         if (m_dragState.Value != DragObjState.Moving)
         {
             return;
         }
 
-        //未吸附则施加力
         m_dragState.Value = DragObjState.Available;
         m_rigidbody.isKinematic = false;
         m_collider.isTrigger = false;
         ChangeLayer("Raycast");
+        TargetChangeLayer(conn, "Raycast");
 
-        Vector3 lastPoint = Vector3Utils.GetPlaneInteractivePoint(screenPos, transform.position.y);
-        Vector3 targetForceVector = lastPoint - transform.position;
-
-        IAttachable attachObj = RaycastContanier(screenPos);
+        IAttachable attachObj = RaycastContanier(ray);
         if (attachObj != null)
         {
             attachObj.Attach(playerNid, this);
         }
         else
-        {
+        {   
+            //未吸附则施加力
             //TODO:可公开施力数值，对于不同类型的子类，施加方向也不同
-            m_rigidbody.AddForceAtPosition(targetForceVector * 200, transform.position + Vector3.up);
+            //m_rigidbody.AddForceAtPosition(targetForceVector * 200, transform.position + Vector3.up);
         }
     }
 
+
     [Server]
-    protected IAttachable RaycastContanier(Vector3 screenPos)
+    protected IAttachable RaycastContanier(Ray ray)
     {
-        Ray ray = Camera.main.ScreenPointToRay(screenPos);
         RaycastHit[] hits = Physics.RaycastAll(ray);
         foreach (RaycastHit hit in hits)
         {
@@ -233,8 +234,6 @@ public abstract class DragObject : OutLineObj
         //    transform.rotation = Quaternion.Lerp(originRot, m_currentClone.transform.rotation, t);
         //}
         #endregion
-
-        m_dragState.Value = DragObjState.Freeze;
 
         //应用旋转
         transform.rotation = attachTrans.rotation;
@@ -281,8 +280,6 @@ public abstract class DragObject : OutLineObj
         transform.position = targetPos;
 
         //重置一些状态变量
-        m_dragState.Value = DragObjState.Available;
-
         m_rigidbody.isKinematic = false;
         m_collider.isTrigger = false;
 
@@ -302,12 +299,36 @@ public abstract class DragObject : OutLineObj
         }
     }
 
+    [TargetRpc]
+    private void TargetChangeLayer(NetworkConnectionToClient conn, string layerName)
+    {
+        Transform[] transforms = GetComponentsInChildren<Transform>();
+        foreach (var child in transforms)
+        {
+            child.gameObject.layer = LayerMask.NameToLayer(layerName);
+        }
+    }
+
+    //TODO:对于服务端和客户段都要执行的，可能有对应方法？
+    [Server]
+    public void ServerBeAdd()
+    {
+        gameObject.SetActive(false);
+        transform.position = transform.position + Vector3.up * 1f;
+        transform.rotation = Quaternion.identity;
+    }
+
     [ClientRpc]
     public void RpcBeAdd()
     {
         gameObject.SetActive(false);
-        transform.position = this.transform.position + Vector3.up * 10f;
-        transform.rotation = Quaternion.identity;
+    }
+
+    //TODO:对于服务端和客户段都要执行的，可能有对应方法？
+    [Server]
+    public void ServerBeGet()
+    {
+        gameObject.SetActive(true);
     }
 
     [ClientRpc]

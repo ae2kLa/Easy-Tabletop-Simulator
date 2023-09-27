@@ -14,19 +14,32 @@ public class Player : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        if (isServer)
+        if (isClient)
         {
-            PlayManager.Instance.Add(this);
-            CmdGiveColor();
+            CmdPlayerAdd();
         }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdPlayerAdd()
+    {
+        PlayManager.Instance.Add(this);
+        this.m_currentColor = GoChessColor.Black;
     }
 
     public override void OnStopClient()
     {
-        if (isServer)
+        if (isClient)
         {
-            PlayManager.Instance.Remove(this);
+            CmdPlayerRemove();
         }
+    }
+
+
+    [Command(requiresAuthority = false)]
+    public void CmdPlayerRemove()
+    {
+        PlayManager.Instance.Remove(this);
     }
 
     private void Update()
@@ -37,49 +50,9 @@ public class Player : NetworkBehaviour
         }
     }
 
-
-    [Command]
-    protected void CmdGiveColor()
-    {
-        if(isServer)
-            m_currentColor = GoChessColor.Black;
-        else
-            m_currentColor = GoChessColor.White;
-    }
-
     [TargetRpc]
     public void TargetSendMsg(NetworkConnectionToClient targetConn, string msg)
     {
         Debug.Log(msg);
     }
-
-
-    //public void GetAuthority(GameObject targetGo)
-    //{
-    //    if (!isLocalPlayer) return;
-
-    //    if(targetGo == null)
-    //    {
-    //        Debug.LogWarning("目标对象为空");
-    //        return;
-    //    }
-
-    //    var id = targetGo.GetComponent<NetworkIdentity>();
-
-    //    if(id == null)
-    //    {
-    //        Debug.LogWarning("目标脚本为空");
-    //        return;
-    //    }
-
-    //    CmdAuthority(id, connectionToClient);
-    //}
-
-    //[Command]
-    //protected void CmdAuthority(NetworkIdentity id, NetworkConnectionToClient connClient)
-    //{
-    //    id.RemoveClientAuthority();
-    //    id.AssignClientAuthority(connClient);
-    //}
-
 }

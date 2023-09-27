@@ -21,19 +21,21 @@ public class GoChessBasket : ContainerObj
         else
         {
             GoChessPiece piece = dragObj as GoChessPiece;
-            return piece.VirtualColor.Value == ContainGoChessColor;
+            return piece.VirtualColor == ContainGoChessColor;
         }
     }
 
-    [ClientRpc]
-    protected override void RpcAfterGenerateHandler(DragObject dragObj)
+    [Server]
+    protected override void AfterGenerate(DragObject dragObj)
     {
         if (dragObj is GoChessPiece)
         {
             GoChessPiece piece = dragObj as GoChessPiece;
-            piece.VirtualColor.Value = ContainGoChessColor;
+            piece.VirtualColor = ContainGoChessColor;
+            piece.RpcColorChange(ContainGoChessColor);
         }
     }
+
 
     [Server]
     protected override bool CheckHandleAddition(uint playerNid)

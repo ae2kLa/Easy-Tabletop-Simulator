@@ -29,7 +29,7 @@ public class AttachArea : OutLineObj, IAttachable
         base.Init();
     }
 
-    [Server]
+
     public void Attach(uint playerNid, DragObject dragObject)
     {
         //TODO:这个方法届时当下沉到子类
@@ -39,9 +39,8 @@ public class AttachArea : OutLineObj, IAttachable
             PlayManager.Instance.SendMsg(playerNid, $"所拖拽物体并非围棋棋子");
             return;
         }
-        else if (piece.VirtualColor.Value != Map.CurrentColor.Value)
+        else if (piece.VirtualColor != Map.CurrentColor.Value)
         {
-            //TODO:RPC通知对应客户端，显示POP-UI提示
             if (Map.CurrentColor.Value == GoChessColor.Black)
                 PlayManager.Instance.SendMsg(playerNid, $"当前是黑子回合，白子落子无效");
             else
@@ -56,6 +55,7 @@ public class AttachArea : OutLineObj, IAttachable
         Grid.Occupied = true;
         Grid.DragObject = dragObject;
 
+        piece.SetDragState(DragObjState.Freeze);
         StartCoroutine(piece.ApplyAttachTransform(transform, () =>
         {
             var rb = piece.transform.GetComponent<Rigidbody>();
@@ -63,7 +63,7 @@ public class AttachArea : OutLineObj, IAttachable
             rb.freezeRotation = true;
 
             //TODO:这个方法届时当下沉到子类
-            if(CheckWin(piece.VirtualColor.Value))
+            if(CheckWin(piece.VirtualColor))
             {
                 PlayManager.Instance.SendAllMsg("检测到五子连成一线");
 
@@ -149,7 +149,7 @@ public class AttachArea : OutLineObj, IAttachable
                 if (Grids[x, y].DragObject is GoChessPiece)
                 {
                     var piece = Grids[x, y].DragObject as GoChessPiece;
-                    if(piece.VirtualColor.Value != color)
+                    if(piece.VirtualColor != color)
                     {
                         lineDone = false;
                         break;

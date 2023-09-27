@@ -31,11 +31,13 @@ public class PlayManager : NetworkBehaviour
     public void Add(Player player)
     {
         m_players.Add(player);
+        Debug.Log($"检测到玩家连接，Nid:{player.netId}");
     }
 
     public void Remove(Player player)
     {
         m_players.Remove(player);
+        Debug.Log($"检测到玩家退出，Nid:{player.netId}");
     }
 
     public void ForEach(UnityAction<Player> callback)
@@ -63,6 +65,17 @@ public class PlayManager : NetworkBehaviour
         {
             player.TargetSendMsg(player.connectionToClient, msg);
         });
+    }
+
+    public NetworkConnectionToClient GetConn(uint playerNid)
+    {
+        NetworkConnectionToClient res = null;
+        ForEach((player) =>
+        {
+            if (player.netId == playerNid)
+                res = player.connectionToClient;
+        });
+        return res;
     }
 
     private void Update()

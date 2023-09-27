@@ -385,7 +385,8 @@ GameObject:
   - component: {fileID: 1382570935}
   - component: {fileID: 1382570936}
   - component: {fileID: 1382570938}
-  - component: {fileID: 1382570939}
+  - component: {fileID: 1382570940}
+  - component: {fileID: 1382570941}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -406,7 +407,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1382570936
 MonoBehaviour:
@@ -425,9 +426,9 @@ MonoBehaviour:
   autoStartServerBuild: 1
   autoConnectClientBuild: 0
   sendRate: 60
-  offlineScene: Assets/Scenes/Lobby.unity
+  offlineScene: Assets/Scenes/Mirror Test.unity
   onlineScene: Assets/Scenes/Mirror Test.unity
-  transport: {fileID: 1382570939}
+  transport: {fileID: 1382570941}
   networkAddress: localhost
   maxConnections: 100
   disconnectInactiveConnections: 0
@@ -469,7 +470,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offsetX: 0
   offsetY: 0
---- !u!114 &1382570939
+--- !u!114 &1382570940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1382570934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90fa7264cc5471f48ba1988923120aff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsAppServer: 1
+--- !u!114 &1382570941
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -481,7 +495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  port: 7777
+  port: 10004
   DualMode: 1
   NoDelay: 1
   Interval: 10
@@ -662,7 +676,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1813821116
 GameObject:

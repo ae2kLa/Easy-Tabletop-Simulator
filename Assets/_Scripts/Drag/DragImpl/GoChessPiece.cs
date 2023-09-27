@@ -1,3 +1,4 @@
+using Mirror;
 using QFramework;
 using System;
 using System.Collections;
@@ -14,7 +15,10 @@ public enum GoChessColor
 public class GoChessPiece : DragObject
 {
     //黑白两方
-    public BindableProperty<GoChessColor> VirtualColor;
+    [SyncVar]
+    public GoChessColor VirtualColor;
+
+    public EasyEvent<GoChessColor> ColorChange;
 
     public Material WhiteMaterial;
     public Material BlackMaterial;
@@ -23,19 +27,22 @@ public class GoChessPiece : DragObject
     {
         base.Init();
 
-        VirtualColor = new BindableProperty<GoChessColor>();
-        VirtualColor.RegisterWithInitValue((virtualColor) =>
+        VirtualColor = GoChessColor.Unknown;
+        ColorChange = new EasyEvent<GoChessColor>();
+    }
+
+    [ClientRpc]
+    public void RpcColorChange(GoChessColor virtualColor)
+    {
+        //修改为对应材质
+        if (virtualColor == GoChessColor.White)
         {
-            //修改为对应材质
-            if(virtualColor == GoChessColor.White)
-            {
-                transform.Find("model").GetComponent<MeshRenderer>().material = WhiteMaterial;
-            }
-            else
-            {
-                transform.Find("model").GetComponent<MeshRenderer>().material = BlackMaterial;
-            }
-        });
+            transform.Find("model").GetComponent<MeshRenderer>().material = WhiteMaterial;
+        }
+        else
+        {
+            transform.Find("model").GetComponent<MeshRenderer>().material = BlackMaterial;
+        }
     }
 
     protected override bool CheckHandleAddition(uint playerNid)
@@ -43,7 +50,7 @@ public class GoChessPiece : DragObject
         bool res = false;
         PlayManager.Instance.ForEach((player) =>
         {
-            if (player.netId == playerNid && player.CurrentColor == VirtualColor.Value)
+            if (player.netId == playerNid && player.CurrentColor == VirtualColor)
                 res = true;
         });
         return res;

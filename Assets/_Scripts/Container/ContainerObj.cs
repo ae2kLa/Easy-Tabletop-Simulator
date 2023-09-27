@@ -1,8 +1,6 @@
 using Mirror;
-using QFramework;
 using Sirenix.OdinInspector;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -52,9 +50,10 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     /// Example: ContainTypes.Add(typeof(subClass of DragObject));
     /// </summary>
     protected abstract void AddContainTypes();
-
     protected abstract bool AddCondition(DragObject dragObj);
 
+
+    [Command(requiresAuthority = false)]
     public void Attach(uint playerNid, DragObject dragObject)
     {
         Add(playerNid, dragObject);
@@ -68,6 +67,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
             return;
         }
 
+        dragObject.ServerBeAdd();
         dragObject.RpcBeAdd();
         Contents.Add(dragObject);
     }
@@ -87,6 +87,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
          CmdGet(NetworkClient.localPlayer.netId);
     }
 
+
     [Command(requiresAuthority = false)]
     public void CmdGet(uint playerNid)
     {
@@ -101,11 +102,11 @@ public abstract class ContainerObj : OutLineObj, IAttachable
             if (CountUnlimitedToggle)
             {
                 var go = Instantiate(CountUnlimitedPrefab,
-                    transform.position + Vector3.up * 10f, Quaternion.identity);
+                    transform.position + Vector3.up * 1f, Quaternion.identity);
                 NetworkServer.Spawn(go, connectionToClient);
                 CurrentDragObj = go.GetComponent<DragObject>();
                 CurrentDragObj.Container = this;
-                RpcAfterGenerateHandler(CurrentDragObj);
+                AfterGenerate(CurrentDragObj);
             }
             else
             {
@@ -119,46 +120,54 @@ public abstract class ContainerObj : OutLineObj, IAttachable
             Contents.RemoveAt(Contents.Count - 1);
         }
 
-        CurrentDragObj.MouseDown();
+        CurrentDragObj.transform.position = transform.position + Vector3.up * 1f;
+        CurrentDragObj.MouseDown(PlayManager.Instance.GetConn(playerNid));
+
+        CurrentDragObj.ServerBeGet();
         CurrentDragObj.RpcBeGet();
     }
 
-    [ClientRpc]
-    protected virtual void RpcAfterGenerateHandler(DragObject dragObj)
+    protected virtual void AfterGenerate(DragObject dragObj)
     {
 
     }
+
 
     public void OnMouseDrag()
     {
-        //服务端要使用的是客户端的鼠标位置，而非服务端的鼠标位置，OnMouseUp同
-        CmdMouseDrag(NetworkClient.localPlayer.netId, Input.mousePosition);
+        Vector3 hitPos;
+        if (Vector3Utils.GetClosetPoint(Input.mousePosition, transform.position, out hitPos))
+        {
+            CmdMouseDrag(NetworkClient.localPlayer.netId, hitPos);
+        }
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseDrag(uint playerNid, Vector3 mousePos)
+    public void CmdMouseDrag(uint playerNid, Vector3 hitPos)
     {
         if (!CheckHandleAddition(playerNid))
         {
             PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
             return;
         }
-        CurrentDragObj?.MouseDrag(mousePos);
+
+        CurrentDragObj?.MouseDrag(hitPos);
     }
 
     public void OnMouseUp()
     {
-        CmdMouseUp(NetworkClient.localPlayer.netId, Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        CmdMouseUp(NetworkClient.localPlayer.netId, ray);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdMouseUp(uint playerNid, Vector3 mousePos)
+    public void CmdMouseUp(uint playerNid, Ray ray)
     {
         if (!CheckHandleAddition(playerNid))
         {
             PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
             return;
         }
-        CurrentDragObj?.MouseUp(playerNid, mousePos) ;
+        CurrentDragObj?.MouseUp(PlayManager.Instance.GetConn(playerNid), playerNid, ray);
     }
 }
