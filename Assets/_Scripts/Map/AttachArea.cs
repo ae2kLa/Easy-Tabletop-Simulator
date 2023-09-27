@@ -55,6 +55,9 @@ public class AttachArea : OutLineObj, IAttachable
         Grid.Occupied = true;
         Grid.DragObject = dragObject;
 
+        //棋子还没移动到目标点时不准在棋盘上落子
+        var currentColor = Map.CurrentColor.Value;
+        Map.CurrentColor.Value = GoChessColor.Unknown;
         StartCoroutine(piece.ApplyAttachTransform(transform, () =>
         {
             var rb = piece.transform.GetComponent<Rigidbody>();
@@ -73,11 +76,11 @@ public class AttachArea : OutLineObj, IAttachable
             }
 
             //回合转换
-            if(Map.CurrentColor.Value == GoChessColor.Black)
+            if(currentColor == GoChessColor.Black)
             {
                 Map.CurrentColor.Value = GoChessColor.White;
             }
-            else
+            else if (currentColor == GoChessColor.White)
             {
                 Map.CurrentColor.Value = GoChessColor.Black;
             }
