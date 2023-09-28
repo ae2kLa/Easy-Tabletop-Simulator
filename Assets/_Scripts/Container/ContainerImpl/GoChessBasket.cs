@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GoChessBasket : ContainerObj
 {
-    public GoChessColor ContainGoChessColor = GoChessColor.White;
+    public GoChessColor ContainGoChessColor = GoChessColor.Unknown;
 
     protected override void AddContainTypes()
     {
@@ -32,10 +32,8 @@ public class GoChessBasket : ContainerObj
         {
             GoChessPiece piece = dragObj as GoChessPiece;
             piece.VirtualColor = ContainGoChessColor;
-            piece.RpcColorChange(ContainGoChessColor);
         }
     }
-
 
     [Server]
     protected override bool CheckHandleAddition(uint playerNid)

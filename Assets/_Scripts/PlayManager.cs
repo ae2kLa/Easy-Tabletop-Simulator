@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.LowLevel;
 
 /// <summary>
 /// 仅服务器管理
@@ -15,6 +16,8 @@ public class PlayManager : NetworkBehaviour
 
     private List<Player> m_players;
 
+    private int maxPlayerCnt = 2;
+
     public override void OnStartServer()
     {
         if(m_instance == null)
@@ -25,6 +28,7 @@ public class PlayManager : NetworkBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
     }
 
@@ -32,12 +36,37 @@ public class PlayManager : NetworkBehaviour
     {
         m_players.Add(player);
         Debug.Log($"检测到玩家连接，Nid:{player.netId}");
+
+        if (PlayManager.Instance.Count() == maxPlayerCnt)
+        {
+            PlayManager.Instance.ForEachWithIndex((i, player) =>
+            {
+                //TODO:后期暴露给玩家选择
+                if (i == 0)
+                    player.CurrentColor = GoChessColor.Black;
+                else if (i == 1)
+                    player.CurrentColor = GoChessColor.White;
+            });
+        }
     }
 
     public void Remove(Player player)
     {
         m_players.Remove(player);
         Debug.Log($"检测到玩家退出，Nid:{player.netId}");
+    }
+
+    public int Count()
+    {
+        return m_players.Count;
+    }
+
+    public void ForEachWithIndex(UnityAction<int, Player> callback)
+    {
+        for(int i = 0; i < m_players.Count; i++)
+        {
+            callback(i, m_players[i]);
+        }
     }
 
     public void ForEach(UnityAction<Player> callback)
@@ -76,14 +105,6 @@ public class PlayManager : NetworkBehaviour
                 res = player.connectionToClient;
         });
         return res;
-    }
-
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            RestartGame();
-        }
     }
 
     public void RestartGame()

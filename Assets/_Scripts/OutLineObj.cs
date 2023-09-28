@@ -3,7 +3,7 @@ using UnityEngine;
 
 public enum HighLightState
 {
-    normal = 0,
+    avaliable = 0,
     freeze
 }
 
@@ -13,21 +13,22 @@ public class OutLineObj : NetworkBehaviour
     protected HighLightState m_highLightState;
     protected Color m_color;
 
-    protected virtual void Init()
+    public override void OnStartClient()
     {
-        m_highLightState = HighLightState.normal;
-
-        if (TryGetComponent<Outline>(out m_outline))
+        if (TryGetComponent(out m_outline))
         {
-            m_outline.enabled = false;
-            m_color = m_outline.OutlineColor;
+            OutlineInit();
         }
     }
 
+    protected virtual void Init()
+    {
+
+    }
 
     protected virtual void OnMouseEnter()
     {
-        if(m_outline != null && m_highLightState == HighLightState.normal)
+        if(m_outline != null && m_highLightState == HighLightState.avaliable)
             m_outline.enabled = true;
     }
 
@@ -38,13 +39,20 @@ public class OutLineObj : NetworkBehaviour
 
     protected virtual void OnMouseExit()
     {
-        if (m_outline != null && m_highLightState == HighLightState.normal)
+        if (m_outline != null && m_highLightState == HighLightState.avaliable)
             m_outline.enabled = false;
     }
 
     public virtual void OnMouseDown()
     {
 
+    }
+
+    public void OutlineInit()
+    {
+        m_outline.enabled = false;
+        m_color = m_outline.OutlineColor;
+        m_highLightState = HighLightState.avaliable;
     }
 
     [ClientRpc]
@@ -63,7 +71,7 @@ public class OutLineObj : NetworkBehaviour
     {
         if (m_outline != null)
         {
-            m_highLightState = HighLightState.normal;
+            m_highLightState = HighLightState.avaliable;
             m_outline.OutlineColor = m_color;
             m_outline.enabled = false;
         }

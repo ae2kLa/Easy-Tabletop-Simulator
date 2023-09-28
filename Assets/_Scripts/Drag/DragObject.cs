@@ -2,10 +2,8 @@ using Mirror;
 using QFramework;
 using System;
 using System.Collections;
-using Tabletop;
 using UnityEngine;
 using UnityEngine.Events;
-using static UnityEditor.PlayerSettings;
 
 public enum DragObjState
 {
@@ -29,11 +27,6 @@ public abstract class DragObject : OutLineObj
     protected BindableProperty<DragObjState> m_dragState;
 
     public ContainerObj Container;
-
-    public void SetDragState(DragObjState targetState)
-    {
-        m_dragState.Value = targetState;
-    }
 
     /// <summary>
     /// 点击时更新的向量
@@ -60,11 +53,13 @@ public abstract class DragObject : OutLineObj
 
     protected float m_yTarget;
 
-    protected virtual void Awake()
+
+    public override void OnStartServer()
     {
         Init();
     }
 
+    [Server]
     protected override void Init()
     {
         base.Init();

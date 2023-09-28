@@ -25,7 +25,6 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         Init();
     }
 
-
     protected override void Init()
     {
         base.Init();
@@ -35,8 +34,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         AddContainTypes();
         foreach (var subClassType in ContainTypes)
         {
-            DragObject dragObject = null;
-            if (CountUnlimitedPrefab.TryGetComponent<DragObject>(out dragObject))
+            if (CountUnlimitedPrefab.TryGetComponent(out DragObject dragObject))
             {
                 if (!dragObject.GetType().Equals(subClassType))
                 {
@@ -129,7 +127,6 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     {
 
     }
-
 
     public void OnMouseDrag()
     {
