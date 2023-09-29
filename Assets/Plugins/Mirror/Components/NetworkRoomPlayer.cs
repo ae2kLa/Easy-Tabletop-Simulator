@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Mirror
 {
@@ -72,7 +73,6 @@ namespace Mirror
             {
                 // only need to call this on client as server removes it before object is destroyed
                 room.roomSlots.Remove(this);
-
                 room.CallOnClientExitRoom();
             }
         }

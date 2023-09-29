@@ -89,10 +89,10 @@ public abstract class DragObject : OutLineObj
     {
         if (!CheckHandleAddition(playerNid))
         {
-            PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
-        MouseDown(PlayManager.Instance.GetConn(playerNid));
+        MouseDown(PlayerManager.Instance.GetConn(playerNid));
     }
 
     [Server]
@@ -123,7 +123,7 @@ public abstract class DragObject : OutLineObj
     {
         if (!CheckHandleAddition(playerNid))
         {
-            PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
         MouseDrag(hitPos);
@@ -156,10 +156,10 @@ public abstract class DragObject : OutLineObj
     {
         if (!CheckHandleAddition(playerNid))
         {
-            PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋子");
             return;
         }
-        MouseUp(PlayManager.Instance.GetConn(playerNid), playerNid, ray);
+        MouseUp(PlayerManager.Instance.GetConn(playerNid), playerNid, ray);
     }
 
     [Server]

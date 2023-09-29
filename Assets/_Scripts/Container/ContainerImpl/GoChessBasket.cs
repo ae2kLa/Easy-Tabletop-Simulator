@@ -39,7 +39,7 @@ public class GoChessBasket : ContainerObj
     protected override bool CheckHandleAddition(uint playerNid)
     {
         bool res = false;
-        PlayManager.Instance.ForEach((player) =>
+        PlayerManager.Instance.ForEach((player) =>
         {
             if (player.netId == playerNid && player.CurrentColor == ContainGoChessColor)
                 res = true;

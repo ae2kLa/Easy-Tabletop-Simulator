@@ -53,10 +53,10 @@ public class MapObject : NetworkBehaviour
         CurrentColor.RegisterWithInitValue((color) =>
         {
             //TODO:首回合还没能显示
-            PlayManager.Instance.ForEach((player) =>
+            PlayerManager.Instance.ForEach((player) =>
             {
                 if (player.CurrentColor == color)
-                    PlayManager.Instance.SendMsg(player.netId, $"现在到你的回合了");
+                    PlayerManager.Instance.SendMsg(player.netId, $"现在到你的回合了");
             });
         });
         ServerStarted = true;

@@ -1,6 +1,5 @@
 using Mirror;
-using System.Collections;
-using System.Collections.Generic;
+using Tabletop;
 using UnityEngine;
 
 public class Player : NetworkBehaviour
@@ -18,9 +17,21 @@ public class Player : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        PlayManager.Instance.Add(this);
+        PlayerManager.Instance.Add(this);
     }
 
+    [Client]
+    public override void OnStartClient()
+    {
+        NetworkClient.RegisterHandler<OppositeExitMessage>(OnOppositeExit);
+    }
+
+    [ClientCallback]
+    private void OnOppositeExit(OppositeExitMessage msg)
+    {
+        print(msg.MsgContent);
+        //NetworkClient.Disconnect();
+    }
 
     private void Update()
     {
@@ -29,15 +40,9 @@ public class Player : NetworkBehaviour
             print("LocalPlayerNid:" + netId);
         }
 
-        //Ö÷¶¯ÍË³ö
-        if (Input.GetKeyDown(KeyCode.B) && isLocalPlayer)
-        {
-            PlayManager.Instance.Remove(this);
-        }
-
         if (Input.GetKeyDown(KeyCode.R))
         {
-            PlayManager.Instance.RestartGame();
+            PlayerManager.Instance.RestartGame();
         }
     }
 

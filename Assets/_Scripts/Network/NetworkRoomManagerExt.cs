@@ -105,17 +105,13 @@ namespace Tabletop
             }
         }
 
-        public override void OnServerConnect(NetworkConnectionToClient conn)
-        {
-            base.OnServerConnect(conn);
-        }
-
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
-            print("OnServerDisconnect:服务器尝试移除对Player的引用");
+            //魔改
+            print("OnServerDisconnect:PlayManager尝试移除对Player的引用");
             if (conn.identity != null && conn.identity.TryGetComponent(out Player player))
             {
-                PlayManager.Instance.Remove(player);
+                PlayerManager.Instance.Remove(player);
             }
 
             base.OnServerDisconnect(conn);

@@ -253,6 +253,7 @@ namespace Mirror
             base.OnServerDisconnect(conn);
 
 #if UNITY_SERVER
+            //TODO:这里可能引发问题，玩家人数小于1时要回到Room场景
             if (numPlayers < 1)
                 StopServer();
 #endif

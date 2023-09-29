@@ -36,15 +36,15 @@ public class AttachArea : OutLineObj, IAttachable
         var piece = dragObject as GoChessPiece;
         if (piece is null)
         {
-            PlayManager.Instance.SendMsg(playerNid, $"所拖拽物体并非围棋棋子");
+            PlayerManager.Instance.SendMsg(playerNid, $"所拖拽物体并非围棋棋子");
             return;
         }
         else if (piece.VirtualColor != Map.CurrentColor.Value)
         {
             if (Map.CurrentColor.Value == GoChessColor.Black)
-                PlayManager.Instance.SendMsg(playerNid, $"当前是黑子回合，白子落子无效");
+                PlayerManager.Instance.SendMsg(playerNid, $"当前是黑子回合，白子落子无效");
             else
-                PlayManager.Instance.SendMsg(playerNid, $"当前是白子回合，黑子落子无效");
+                PlayerManager.Instance.SendMsg(playerNid, $"当前是白子回合，黑子落子无效");
 
             //落子无效时自动将棋子移回棋篓
             StartCoroutine(piece.RecycleDragObject(playerNid));
@@ -67,7 +67,7 @@ public class AttachArea : OutLineObj, IAttachable
             //TODO:这个方法届时当下沉到子类
             if(CheckWin(piece.VirtualColor))
             {
-                PlayManager.Instance.SendAllMsg("检测到五子连成一线");
+                PlayerManager.Instance.SendAllMsg("检测到五子连成一线");
 
                 //TODO:清空棋盘，重新开始
 

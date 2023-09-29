@@ -8,10 +8,10 @@ using UnityEngine.Events;
 /// <summary>
 /// 仅服务器管理
 /// </summary>
-public class PlayManager : NetworkBehaviour
+public class PlayerManager : NetworkBehaviour
 {
-    public static PlayManager Instance => m_instance;
-    public static PlayManager m_instance = null;
+    public static PlayerManager Instance => m_instance;
+    public static PlayerManager m_instance = null;
 
     private List<Player> m_players;
 
@@ -36,9 +36,9 @@ public class PlayManager : NetworkBehaviour
         m_players.Add(player);
         Debug.Log($"玩家Nid:{player.netId}加入游戏");
 
-        if (PlayManager.Instance.Count() == maxPlayerCnt)
+        if (PlayerManager.Instance.Count() == maxPlayerCnt)
         {
-            PlayManager.Instance.ForEachWithIndex((i, player) =>
+            PlayerManager.Instance.ForEachWithIndex((i, player) =>
             {
                 //TODO:后期暴露给玩家选择
                 if (i == 0)
@@ -52,7 +52,19 @@ public class PlayManager : NetworkBehaviour
     public void Remove(Player player)
     {
         m_players.Remove(player);
-        Debug.Log($"检测到玩家退出，Nid:{player.netId}");
+        //SendAllMsg($"玩家Nid:{player.netId}退出");
+
+        NetworkServer.SendToAll(new OppositeExitMessage()
+        {
+            MsgContent = $"玩家Nid:{player.netId}退出"
+        },
+        Channels.Reliable, true); ;
+
+        //if (NetworkManager.singleton is NetworkRoomManager room &&
+        //SceneManager.GetActiveScene().path == room.GameplayScene)
+        //{
+        //    room.StopClient();
+        //}
     }
 
     public int Count()

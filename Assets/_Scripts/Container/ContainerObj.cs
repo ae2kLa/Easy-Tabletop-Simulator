@@ -59,7 +59,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     {
         if (!ContainTypes.Contains(dragObject.GetType()) || !AddCondition(dragObject))
         {
-            PlayManager.Instance.SendMsg(playerNid, "该容器不装载此物体");
+            PlayerManager.Instance.SendMsg(playerNid, "该容器不装载此物体");
             return;
         }
 
@@ -89,7 +89,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     {
         if (!CheckHandleAddition(playerNid))
         {
-            PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
             return;
         }
 
@@ -106,7 +106,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
             }
             else
             {
-                PlayManager.Instance.SendMsg(playerNid, "容器是空的");
+                PlayerManager.Instance.SendMsg(playerNid, "容器是空的");
                 return;
             }
         }
@@ -117,7 +117,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
         }
 
         CurrentDragObj.transform.position = transform.position + Vector3.up * 1f;
-        CurrentDragObj.MouseDown(PlayManager.Instance.GetConn(playerNid));
+        CurrentDragObj.MouseDown(PlayerManager.Instance.GetConn(playerNid));
 
         CurrentDragObj.ServerBeGet();
         CurrentDragObj.RpcBeGet();
@@ -142,7 +142,7 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     {
         if (!CheckHandleAddition(playerNid))
         {
-            PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
             return;
         }
 
@@ -160,9 +160,9 @@ public abstract class ContainerObj : OutLineObj, IAttachable
     {
         if (!CheckHandleAddition(playerNid))
         {
-            PlayManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
+            PlayerManager.Instance.SendMsg(playerNid, "你不能使用对方的棋篓");
             return;
         }
-        CurrentDragObj?.MouseUp(PlayManager.Instance.GetConn(playerNid), playerNid, ray);
+        CurrentDragObj?.MouseUp(PlayerManager.Instance.GetConn(playerNid), playerNid, ray);
     }
 }
