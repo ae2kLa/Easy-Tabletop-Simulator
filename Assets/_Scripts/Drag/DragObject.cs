@@ -56,6 +56,7 @@ public abstract class DragObject : OutLineObj
 
     public override void OnStartServer()
     {
+        print("DragObject__OnStartServer");
         Init();
     }
 
@@ -199,11 +200,11 @@ public abstract class DragObject : OutLineObj
              
             Transform hitObjTrans = hit.collider.transform;
             IAttachable attachObj = null;
-            if (hitObjTrans.TryGetComponent<IAttachable>(out attachObj))
+            if (hitObjTrans.TryGetComponent(out attachObj))
             {
                 return attachObj;
             }
-            else if (hitObjTrans.parent != null && hitObjTrans.parent.TryGetComponent<IAttachable>(out attachObj))
+            else if (hitObjTrans.parent != null && hitObjTrans.parent.TryGetComponent(out attachObj))
             {
                 return attachObj;
             }

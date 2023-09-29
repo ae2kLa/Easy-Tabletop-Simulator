@@ -33,6 +33,7 @@ public class GoChessPiece : DragObject
 
     public override void OnStartClient()
     {
+        base.OnStartClient();
         CmdSyncState();
     }
 

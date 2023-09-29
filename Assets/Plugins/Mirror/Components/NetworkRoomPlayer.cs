@@ -4,7 +4,10 @@ namespace Mirror
 {
     /// <summary>
     /// This component works in conjunction with the NetworkRoomManager to make up the multiplayer room system.
-    /// <para>The RoomPrefab object of the NetworkRoomManager must have this component on it. This component holds basic room player data required for the room to function. Game specific data for room players can be put in other components on the RoomPrefab or in scripts derived from NetworkRoomPlayer.</para>
+    /// <para>The RoomPrefab object of the NetworkRoomManager must have this component on it.
+    /// This component holds basic room player data required for the room to function.
+    /// Game specific data for room players can be put in other components on the RoomPrefab or
+    /// in scripts derived from NetworkRoomPlayer.</para>
     /// </summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("Network/Network Room Player")]
@@ -61,6 +64,7 @@ namespace Mirror
             }
             else Debug.LogError("RoomPlayer could not find a NetworkRoomManager. The RoomPlayer requires a NetworkRoomManager object to function. Make sure that there is one in the scene.");
         }
+
 
         public virtual void OnDisable()
         {
