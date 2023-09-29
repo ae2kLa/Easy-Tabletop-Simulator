@@ -207,6 +207,7 @@ namespace Mirror
             if (!Utils.IsSceneActive(RoomScene))
             {
                 Debug.Log($"Not in Room scene...disconnecting {conn}");
+                
                 conn.Disconnect();
                 return;
             }

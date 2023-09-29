@@ -21,6 +21,7 @@ public class Player : NetworkBehaviour
         PlayManager.Instance.Add(this);
     }
 
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space) && isLocalPlayer)

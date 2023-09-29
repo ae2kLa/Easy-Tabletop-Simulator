@@ -56,7 +56,6 @@ public abstract class DragObject : OutLineObj
 
     public override void OnStartServer()
     {
-        print("DragObject__OnStartServer");
         Init();
     }
 
