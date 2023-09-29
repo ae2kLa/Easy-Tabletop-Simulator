@@ -1,7 +1,8 @@
+using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Mirror.Examples.NetworkRoom
+namespace Tabletop
 {
     [AddComponentMenu("")]
     public class NetworkRoomPlayerExt : NetworkRoomPlayer
@@ -35,5 +36,6 @@ namespace Mirror.Examples.NetworkRoom
         {
             base.OnGUI();
         }
+
     }
 }

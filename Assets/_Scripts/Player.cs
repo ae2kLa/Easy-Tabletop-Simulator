@@ -16,28 +16,10 @@ public class Player : NetworkBehaviour
         get { return m_currentColor; }
     }
 
-    public override void OnStartClient()
+    public override void OnStartServer()
     {
-
+        PlayManager.Instance.Add(this);
     }
-
-    //[Command(requiresAuthority = false)]
-    //public void CmdPlayerAdd()
-    //{
-    //    PlayManager.Instance.Add(this);
-    //    this.m_currentColor = GoChessColor.Black;
-    //}
-
-    public override void OnStopClient()
-    {
-
-    }
-
-    //[Command(requiresAuthority = false)]
-    //public void CmdPlayerRemove()
-    //{
-    //    PlayManager.Instance.Remove(this);
-    //}
 
     private void Update()
     {

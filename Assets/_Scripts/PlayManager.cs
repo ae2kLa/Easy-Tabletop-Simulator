@@ -1,10 +1,9 @@
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using Tabletop;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.LowLevel;
 
 /// <summary>
 /// 仅服务器管理
@@ -35,7 +34,7 @@ public class PlayManager : NetworkBehaviour
     public void Add(Player player)
     {
         m_players.Add(player);
-        Debug.Log($"检测到玩家连接，Nid:{player.netId}");
+        Debug.Log($"玩家Nid:{player.netId}加入游戏");
 
         if (PlayManager.Instance.Count() == maxPlayerCnt)
         {

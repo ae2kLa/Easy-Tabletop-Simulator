@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Mirror Test.unity
+    path: Assets/Art/Scenes/Offline.unity
+    guid: 1224fbcb0ed33ba4990485b06142121b
+  - enabled: 1
+    path: Assets/Art/Scenes/OnlineGameplay.unity
     guid: 156f6a17cd16a6146b63a935e960d74d
+  - enabled: 1
+    path: Assets/Art/Scenes/OnlineRoom.unity
+    guid: 21b66e1cb51e31145bb8ff3428959ef1
   m_configObjects: {}

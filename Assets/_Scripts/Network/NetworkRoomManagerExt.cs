@@ -1,20 +1,18 @@
 using kcp2k;
+using Mirror;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-/*
-	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
-	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkManager.html
-*/
-
-namespace Mirror.Examples.NetworkRoom
+namespace Tabletop
 {
     [AddComponentMenu("")]
     public class NetworkRoomManagerExt : NetworkRoomManager
     {
-        [Header("Spawner Setup")]
-        [Tooltip("Reward Prefab for the Spawner")]
-        public GameObject rewardPrefab;
+        //[Header("Spawner Setup")]
+        //[Tooltip("Reward Prefab for the Spawner")]
+        //public GameObject rewardPrefab;
 
         public static new NetworkRoomManagerExt singleton { get; private set; }
 
@@ -27,7 +25,8 @@ namespace Mirror.Examples.NetworkRoom
             base.Awake();
             singleton = this;
 
-            if(autoStartServerBuild)
+            //打包为DS时记得勾选此项
+            if (autoStartServerBuild)
                 InitForServerBuild();
         }
 
@@ -39,7 +38,10 @@ namespace Mirror.Examples.NetworkRoom
         {
             // spawn the initial batch of Rewards
             if (sceneName == GameplayScene)
+            {
                 Spawner.InitialSpawn();
+            }
+                
         }
 
         /// <summary>
@@ -52,8 +54,8 @@ namespace Mirror.Examples.NetworkRoom
         /// <returns>true unless some code in here decides it needs to abort the replacement</returns>
         public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnectionToClient conn, GameObject roomPlayer, GameObject gamePlayer)
         {
-            PlayerScore playerScore = gamePlayer.GetComponent<PlayerScore>();
-            playerScore.index = roomPlayer.GetComponent<NetworkRoomPlayer>().index;
+            //PlayerScore playerScore = gamePlayer.GetComponent<PlayerScore>();
+            //playerScore.index = roomPlayer.GetComponent<NetworkRoomPlayer>().index;
             return true;
         }
 
@@ -98,9 +100,11 @@ namespace Mirror.Examples.NetworkRoom
                 //set to false to hide it in the game scene
                 showStartButton = false;
 
+                //切换场景的时候会自动更换Player的gameObject
                 ServerChangeScene(GameplayScene);
             }
         }
+
 
         public void SetPort(string port)
         {
@@ -125,4 +129,6 @@ namespace Mirror.Examples.NetworkRoom
             NetworkRoomManagerExt.singleton.StartServer();
         }
     }
+
 }
+
