@@ -105,13 +105,27 @@ namespace Tabletop
             }
         }
 
+        bool disconnect = false;
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
             //魔改
-            print("OnServerDisconnect:PlayManager尝试移除对Player的引用");
-            if (conn.identity != null && conn.identity.TryGetComponent(out Player player))
+            //print("OnServerDisconnect:PlayManager尝试移除对Player的引用");
+
+            //进入GamePlay场景后（conn主物体变为Player后）才发送退出消息
+
+            if(conn.identity != null && conn.identity.TryGetComponent(out Player player))
             {
                 PlayerManager.Instance.Remove(player);
+
+                if(!disconnect)
+                {
+                    disconnect = true;
+                    NetworkServer.SendToReady(new OppositeExitMessage()
+                    {
+                        MsgContent = $"玩家Nid:{player.netId}退出"
+                    },
+                    Channels.Reliable);
+                }
             }
 
             base.OnServerDisconnect(conn);

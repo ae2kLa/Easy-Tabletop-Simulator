@@ -1,5 +1,6 @@
 using Mirror;
 using Tabletop;
+using UnityEditor.MemoryProfiler;
 using UnityEngine;
 
 public class Player : NetworkBehaviour
@@ -23,19 +24,20 @@ public class Player : NetworkBehaviour
     [Client]
     public override void OnStartClient()
     {
-        NetworkClient.RegisterHandler<OppositeExitMessage>(OnOppositeExit);
+        NetworkClient.ReplaceHandler<OppositeExitMessage>(OnOppositeExit, false);
     }
 
     [ClientCallback]
     private void OnOppositeExit(OppositeExitMessage msg)
     {
-        print(msg.MsgContent);
-        //NetworkClient.Disconnect();
+        print(msg.MsgContent + "°´B¼üStopClient");
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isLocalPlayer)
+        if (!isLocalPlayer) return;
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             print("LocalPlayerNid:" + netId);
         }
@@ -43,6 +45,11 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             PlayerManager.Instance.RestartGame();
+        }
+
+        if(Input.GetKeyDown(KeyCode.B))
+        {
+            NetworkManager.singleton.StopClient();
         }
     }
 

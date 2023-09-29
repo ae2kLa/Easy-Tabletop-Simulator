@@ -2,6 +2,7 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using Tabletop;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -52,19 +53,6 @@ public class PlayerManager : NetworkBehaviour
     public void Remove(Player player)
     {
         m_players.Remove(player);
-        //SendAllMsg($"玩家Nid:{player.netId}退出");
-
-        NetworkServer.SendToAll(new OppositeExitMessage()
-        {
-            MsgContent = $"玩家Nid:{player.netId}退出"
-        },
-        Channels.Reliable, true); ;
-
-        //if (NetworkManager.singleton is NetworkRoomManager room &&
-        //SceneManager.GetActiveScene().path == room.GameplayScene)
-        //{
-        //    room.StopClient();
-        //}
     }
 
     public int Count()
