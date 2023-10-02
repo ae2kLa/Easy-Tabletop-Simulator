@@ -26,7 +26,24 @@ namespace Tabletop
 
             //打包为DS时记得勾选此项
             if (autoStartServerBuild)
+            {
                 InitForServerBuild();
+            }
+            else
+            {
+
+            }
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            //按C扫描房间
+            if(Input.GetKeyDown(KeyCode.C))
+            {
+                CheckRoomAvaliable();
+            }
         }
 
         /// <summary>
@@ -192,6 +209,36 @@ namespace Tabletop
             //    var value = Enum.GetName(typeof(RoomState), roomState);
             //    db.StringSet(key, value);
             //}
+        }
+
+        public void CheckRoomAvaliable()
+        {
+            var db = conn.GetDatabase();
+            for (int i = 10004; i <= 10007; i++)
+            {
+                RedisKey key = "Room" + i.ToString();
+                RedisValue value = db.StringGet(key);
+                print($"{key}: {value}");
+                if (value.HasValue)
+                {
+                    var roomState = (RoomState)Enum.Parse(typeof(RoomState), value);
+                    switch(roomState)
+                    {
+                        case RoomState.Available:
+                            break;
+                        case RoomState.Full:
+                            break;
+                        case RoomState.Started:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("该房间状态不在枚举范围内");
+                }
+            }
         }
     }
 }
