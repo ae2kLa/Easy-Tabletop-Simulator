@@ -1,8 +1,7 @@
 using kcp2k;
 using Mirror;
+using StackExchange.Redis;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Tabletop
@@ -40,8 +39,10 @@ namespace Tabletop
             if (sceneName == GameplayScene)
             {
                 Spawner.InitialSpawn();
+
+                //开始游戏时更新Redis
+                SetRedisValue(RoomState.Started);
             }
-                
         }
 
         /// <summary>
@@ -80,15 +81,15 @@ namespace Tabletop
 
         bool showStartButton;
 
-        public override void OnRoomServerPlayersReady()
-        {
-            // calling the base method calls ServerChangeScene as soon as all players are in Ready state.
-#if UNITY_SERVER
-            base.OnRoomServerPlayersReady();
-#else
-            showStartButton = true;
-#endif
-        }
+        //        public override void OnRoomServerPlayersReady()
+        //        {
+        //            // calling the base method calls ServerChangeScene as soon as all players are in Ready state.
+        //#if UNITY_SERVER
+        //            base.OnRoomServerPlayersReady();
+        //#else
+        //            showStartButton = true;
+        //#endif
+        //        }
 
         public override void OnGUI()
         {
@@ -97,7 +98,6 @@ namespace Tabletop
             if (allPlayersReady && showStartButton && GUI.Button(new Rect(150, 300, 120, 20), "START GAME"))
             {
                 print("游戏开始！");
-                //set to false to hide it in the game scene
                 showStartButton = false;
 
                 //切换场景的时候会自动更换Player的gameObject
@@ -105,15 +105,28 @@ namespace Tabletop
             }
         }
 
+        public override void ServerChangeScene(string newSceneName)
+        {
+            base.ServerChangeScene(newSceneName);
+
+            //游戏开始后更新Redis
+#if UNITY_SERVER
+            SetRedisValue(RoomState.Started);
+#endif
+        }
+
+
+
         bool disconnect = false;
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
+            //玩家退出时（不论何种退出）更新Redis
+            SetRedisValue(RoomState.Available);
             //魔改
             //print("OnServerDisconnect:PlayManager尝试移除对Player的引用");
 
-            //进入GamePlay场景后（conn主物体变为Player后）才发送退出消息
-
-            if(conn.identity != null && conn.identity.TryGetComponent(out Player player))
+            //进入GamePlay场景后（即conn主物体变为Player后）才发送退出消息
+            if (conn.identity != null && conn.identity.TryGetComponent(out Player player))
             {
                 PlayerManager.Instance.Remove(player);
 
@@ -141,7 +154,6 @@ namespace Tabletop
         {
             Debug.Log("InitForServerBuild");
             string CommandLine = Environment.CommandLine;
-            //Debug.Log(CommandLine);
             string[] CommandLineArgs = Environment.GetCommandLineArgs();
             for (int i = 0; i < CommandLineArgs.Length; i++)
             {
@@ -149,12 +161,32 @@ namespace Tabletop
                 if (CommandLineArgs[i] == "--port" && i + 1 < CommandLineArgs.Length)
                 {
                     string port = CommandLineArgs[i + 1];
-                    NetworkRoomManagerExt.singleton.gameObject.SendMessage("SetPort", port);
+                    //NetworkRoomManagerExt.singleton.gameObject.SendMessage("SetPort", port);
+                    SetPort(port);
                 }
             }
             NetworkRoomManagerExt.singleton.StartServer();
+
+            //刚部署时更新Redis
+            SetRedisValue(RoomState.Available);
+        }
+
+        ConnectionMultiplexer conn = RedisHelper.RedisConn;
+        public void SetRedisValue(RoomState roomState)
+        {
+            var db = conn.GetDatabase();
+            var key = "Room" + (transport as KcpTransport).port.ToString();
+            var value = Enum.GetName(typeof(RoomState), roomState);
+            db.StringSet(key, value);
+
+            //using (ConnectionMultiplexer conn = RedisHelper.RedisConn)
+            //{
+            //    var db = conn.GetDatabase();
+            //    var key = "Room" + (transport as KcpTransport).port.ToString();
+            //    var value = Enum.GetName(typeof(RoomState), roomState);
+            //    db.StringSet(key, value);
+            //}
         }
     }
-
 }
 

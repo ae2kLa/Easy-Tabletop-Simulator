@@ -1,6 +1,6 @@
 using Mirror;
+using System;
 using Tabletop;
-using UnityEditor.MemoryProfiler;
 using UnityEngine;
 
 public class Player : NetworkBehaviour
@@ -24,18 +24,34 @@ public class Player : NetworkBehaviour
     [Client]
     public override void OnStartClient()
     {
-        NetworkClient.ReplaceHandler<OppositeExitMessage>(OnOppositeExit, false);
+        NetworkClient.RegisterHandler<OppositeExitMessage>(OnOppositeExit);
     }
 
+    /// <summary>
+    /// TODO:暂时先用标志位标记，日后改为UI显示
+    /// </summary>
+    public bool oppositeExit = false;
     [ClientCallback]
     private void OnOppositeExit(OppositeExitMessage msg)
     {
+        print(NetworkClient.localPlayer.netId);
+        oppositeExit = true;
         print(msg.MsgContent + "按B键StopClient");
+        print("OnOppositeExit:oppositeExit" + oppositeExit);
     }
+
 
     private void Update()
     {
         if (!isLocalPlayer) return;
+
+        //oppositeExit = true;
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            print("B, oppositeExit:" + oppositeExit);
+            if (oppositeExit)
+                NetworkManager.singleton.StopClient();
+        }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -45,11 +61,6 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             PlayerManager.Instance.RestartGame();
-        }
-
-        if(Input.GetKeyDown(KeyCode.B))
-        {
-            NetworkManager.singleton.StopClient();
         }
     }
 

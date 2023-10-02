@@ -1,3 +1,4 @@
+using kcp2k;
 using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,6 +8,18 @@ namespace Tabletop
     [AddComponentMenu("")]
     public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
+        public override void Start()
+        {
+            base.Start();
+
+            //更新Redis
+            if (NetworkManager.singleton is NetworkRoomManagerExt room && room.roomSlots.Count == room.minPlayers)
+            {
+                room.SetRedisValue(RoomState.Full);
+                print($"我在执行更新Redis: RoomState.Full, port: {(room.transport as KcpTransport).port}");
+            }
+        }
+
         #region 各种无参回调
         public override void OnStartClient()
         {
@@ -39,7 +52,5 @@ namespace Tabletop
         {
             base.OnGUI();
         }
-
-
     }
 }
