@@ -24,7 +24,7 @@ public class Player : NetworkBehaviour
     [Client]
     public override void OnStartClient()
     {
-        NetworkClient.RegisterHandler<OppositeExitMessage>(OnOppositeExit);
+        NetworkClient.ReplaceHandler<OppositeExitMessage>(OnOppositeExit);
     }
 
     /// <summary>

@@ -120,8 +120,6 @@ namespace Tabletop
         bool disconnect = false;
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
-            //玩家退出时（不论何种退出）更新Redis
-            SetRedisValue(RoomState.Available);
             //魔改
             //print("OnServerDisconnect:PlayManager尝试移除对Player的引用");
 
@@ -142,6 +140,14 @@ namespace Tabletop
             }
 
             base.OnServerDisconnect(conn);
+
+            //玩家退出时（不论何种退出）更新Redis
+            SetRedisValue(RoomState.Available);
+
+            if (roomSlots.Count == 0)
+            {
+                ServerChangeScene(RoomScene);
+            }
         }
 
 
