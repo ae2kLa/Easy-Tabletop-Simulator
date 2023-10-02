@@ -27,6 +27,11 @@ public class Player : NetworkBehaviour
         NetworkClient.ReplaceHandler<OppositeExitMessage>(OnOppositeExit);
     }
 
+    public override void OnStopClient()
+    {
+        NetworkClient.UnregisterHandler<OppositeExitMessage>();
+    }
+
     /// <summary>
     /// TODO:暂时先用标志位标记，日后改为UI显示
     /// </summary>
