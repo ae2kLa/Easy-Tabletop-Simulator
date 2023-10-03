@@ -12,10 +12,6 @@ namespace Tabletop
     [AddComponentMenu("")]
     public class NetworkRoomManagerExt : NetworkRoomManager
     {
-        //[Header("Spawner Setup")]
-        //[Tooltip("Reward Prefab for the Spawner")]
-        //public GameObject rewardPrefab;
-
         public static new NetworkRoomManagerExt singleton { get; private set; }
 
         /// <summary>
@@ -54,8 +50,6 @@ namespace Tabletop
             // spawn the initial batch of Rewards
             if (sceneName == GameplayScene)
             {
-                Spawner.InitialSpawn();
-
                 //开始游戏时更新Redis
                 SetRedisValue(RoomState.Started);
             }
@@ -137,7 +131,6 @@ namespace Tabletop
         }
 
 
-
         bool disconnect = false;
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
@@ -184,11 +177,9 @@ namespace Tabletop
             string[] CommandLineArgs = Environment.GetCommandLineArgs();
             for (int i = 0; i < CommandLineArgs.Length; i++)
             {
-                //Debug.Log(CommandLineArgs[i]);
                 if (CommandLineArgs[i] == "--port" && i + 1 < CommandLineArgs.Length)
                 {
                     string port = CommandLineArgs[i + 1];
-                    //NetworkRoomManagerExt.singleton.gameObject.SendMessage("SetPort", port);
                     SetPort(port);
                 }
             }
@@ -198,7 +189,6 @@ namespace Tabletop
             SetRedisValue(RoomState.Available);
         }
 
-        ConnectionMultiplexer Conn => RedisHelper.RedisConn;
         public void SetRedisValue(RoomState roomState)
         {
             //var db = Conn.GetDatabase();
@@ -210,32 +200,32 @@ namespace Tabletop
         public List<RoomInfo> Rooms = new List<RoomInfo>();
         public void CheckRoomAvaliable()
         {
-            Rooms.Clear();
+            //Rooms.Clear();
 
-            var db = Conn.GetDatabase();
-            for (ushort i = 10004; i <= 10007; i++)
-            {
-                RedisKey key = "Room" + i.ToString();
-                RedisValue value = db.StringGet(key);
-                print($"{key}: {value}");
-                if (value.HasValue)
-                {
-                    var roomState = (RoomState)Enum.Parse(typeof(RoomState), value);
-                    switch(roomState)
-                    {
-                        case RoomState.Available:
-                            break;
-                        case RoomState.Full:
-                            break;
-                        case RoomState.Started:
-                            break;
-                        default:
-                            Debug.LogWarning("该房间状态不在枚举范围内");
-                            break;
-                    }
-                    Rooms.Add(new RoomInfo(key, i, roomState));
-                }
-            }
+            //var db = Conn.GetDatabase();
+            //for (ushort i = 10004; i <= 10007; i++)
+            //{
+            //    RedisKey key = "Room" + i.ToString();
+            //    RedisValue value = db.StringGet(key);
+            //    print($"{key}: {value}");
+            //    if (value.HasValue)
+            //    {
+            //        var roomState = (RoomState)Enum.Parse(typeof(RoomState), value);
+            //        switch(roomState)
+            //        {
+            //            case RoomState.Available:
+            //                break;
+            //            case RoomState.Full:
+            //                break;
+            //            case RoomState.Started:
+            //                break;
+            //            default:
+            //                Debug.LogWarning("该房间状态不在枚举范围内");
+            //                break;
+            //        }
+            //        Rooms.Add(new RoomInfo(key, i, roomState));
+            //    }
+            //}
         }
     }
 }
