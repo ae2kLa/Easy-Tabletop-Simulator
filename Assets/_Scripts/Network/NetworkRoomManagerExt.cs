@@ -2,6 +2,9 @@ using kcp2k;
 using Mirror;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 namespace Tabletop
@@ -28,10 +31,6 @@ namespace Tabletop
             if (autoStartServerBuild)
             {
                 InitForServerBuild();
-            }
-            else
-            {
-
             }
         }
 
@@ -120,16 +119,21 @@ namespace Tabletop
                 //切换场景的时候会自动更换Player的gameObject
                 ServerChangeScene(GameplayScene);
             }
+
+            GUILayout.BeginArea(new Rect(0, 300, Screen.width, Screen.height));
+            for (int i = 0; i < Rooms.Count; i++)
+            {
+                if (GUI.Button(new Rect(20 + i * 90, 40, 80, 20), Rooms[i].RoomName + Rooms[i].RoomState.ToString()))
+                {
+                    (transport as KcpTransport).port = Rooms[i].Port;
+                }
+            }
+            GUILayout.EndArea();
         }
 
         public override void ServerChangeScene(string newSceneName)
         {
             base.ServerChangeScene(newSceneName);
-
-            //游戏开始后更新Redis
-#if UNITY_SERVER
-            SetRedisValue(RoomState.Started);
-#endif
         }
 
 
@@ -194,27 +198,22 @@ namespace Tabletop
             SetRedisValue(RoomState.Available);
         }
 
-        ConnectionMultiplexer conn = RedisHelper.RedisConn;
+        ConnectionMultiplexer Conn => RedisHelper.RedisConn;
         public void SetRedisValue(RoomState roomState)
         {
-            var db = conn.GetDatabase();
-            var key = "Room" + (transport as KcpTransport).port.ToString();
-            var value = Enum.GetName(typeof(RoomState), roomState);
-            db.StringSet(key, value);
-
-            //using (ConnectionMultiplexer conn = RedisHelper.RedisConn)
-            //{
-            //    var db = conn.GetDatabase();
-            //    var key = "Room" + (transport as KcpTransport).port.ToString();
-            //    var value = Enum.GetName(typeof(RoomState), roomState);
-            //    db.StringSet(key, value);
-            //}
+            //var db = Conn.GetDatabase();
+            //var key = "Room" + (transport as KcpTransport).port.ToString();
+            //var value = Enum.GetName(typeof(RoomState), roomState);
+            //db.StringSet(key, value);
         }
 
+        public List<RoomInfo> Rooms = new List<RoomInfo>();
         public void CheckRoomAvaliable()
         {
-            var db = conn.GetDatabase();
-            for (int i = 10004; i <= 10007; i++)
+            Rooms.Clear();
+
+            var db = Conn.GetDatabase();
+            for (ushort i = 10004; i <= 10007; i++)
             {
                 RedisKey key = "Room" + i.ToString();
                 RedisValue value = db.StringGet(key);
@@ -231,12 +230,10 @@ namespace Tabletop
                         case RoomState.Started:
                             break;
                         default:
+                            Debug.LogWarning("该房间状态不在枚举范围内");
                             break;
                     }
-                }
-                else
-                {
-                    Debug.LogWarning("该房间状态不在枚举范围内");
+                    Rooms.Add(new RoomInfo(key, i, roomState));
                 }
             }
         }
