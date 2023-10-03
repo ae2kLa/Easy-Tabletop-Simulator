@@ -2,15 +2,24 @@ namespace Tabletop
 {
     public struct RoomInfo
     {
-        public string RoomName;
+        public string Name;
+        public RoomState State;
         public ushort Port;
-        public RoomState RoomState;
 
-        public RoomInfo(string roomName, ushort port, RoomState roomState)
+        public RoomInfo(string name, ushort port, RoomState state)
         {
-            RoomName = roomName;
+            Name = name;
             Port = port;
-            RoomState = roomState;
+            State = state;
         }
+
+        ////通过 json 获取到的 string 值给本实体类的枚举赋值
+        //public string State
+        //{
+        //    set
+        //    {
+        //        m_state = (RoomState)System.Enum.Parse(typeof(RoomState), value);
+        //    }
+        //}
     }
 }

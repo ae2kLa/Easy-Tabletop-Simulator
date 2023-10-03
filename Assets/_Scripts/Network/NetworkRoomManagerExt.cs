@@ -117,9 +117,13 @@ namespace Tabletop
             GUILayout.BeginArea(new Rect(0, 300, Screen.width, Screen.height));
             for (int i = 0; i < Rooms.Count; i++)
             {
-                if (GUI.Button(new Rect(20 + i * 90, 40, 80, 20), Rooms[i].RoomName + Rooms[i].RoomState.ToString()))
+                if (GUI.Button(new Rect(20 + i * 100, 40, 100, 20), Rooms[i].Name + Rooms[i].State.ToString()))
                 {
-                    (transport as KcpTransport).port = Rooms[i].Port;
+                    if (Rooms[i].State == RoomState.Available)
+                    {
+                        (transport as KcpTransport).port = Rooms[i].Port;
+                        StartClient();
+                    }
                 }
             }
             GUILayout.EndArea();
@@ -232,9 +236,12 @@ namespace Tabletop
 
                 if (request.result == UnityWebRequest.Result.Success)
                 {
-                    Debug.Log($"SetRedisValue Success, info:{request.downloadHandler.text}");
+                    Debug.Log($"CheckRoomAvaliable Success, info:{request.downloadHandler.text}");
                     string receiveContent = request.downloadHandler.text;
-                    List<RoomInfo> rooms = JsonMapper.ToObject<List<RoomInfo>>(receiveContent);
+                    Rooms = JsonMapper.ToObject<List<RoomInfo>>(receiveContent);
+
+                    foreach (var room in Rooms)
+                        print($"room:{room.Name},{room.Port},{room.State}");
                 }
                 else
                 {
