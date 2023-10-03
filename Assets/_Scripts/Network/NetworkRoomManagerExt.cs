@@ -1,17 +1,11 @@
+using LitJson;
 using kcp2k;
 using Mirror;
-using MoonSharp.Interpreter.Serialization.Json;
-using StackExchange.Redis;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.XR;
 
 namespace Tabletop
 {
@@ -43,7 +37,7 @@ namespace Tabletop
             //按C扫描房间
             if(Input.GetKeyDown(KeyCode.C))
             {
-                CheckRoomAvaliable();
+                StartCoroutine(CheckRoomAvaliable());
             }
         }
 
@@ -225,34 +219,28 @@ namespace Tabletop
 
 
         public List<RoomInfo> Rooms = new List<RoomInfo>();
-        public void CheckRoomAvaliable()
+        public IEnumerator CheckRoomAvaliable()
         {
-            //Rooms.Clear();
+            Rooms.Clear();
 
-            //var db = Conn.GetDatabase();
-            //for (ushort i = 10004; i <= 10007; i++)
-            //{
-            //    RedisKey key = "Room" + i.ToString();
-            //    RedisValue value = db.StringGet(key);
-            //    print($"{key}: {value}");
-            //    if (value.HasValue)
-            //    {
-            //        var roomState = (RoomState)Enum.Parse(typeof(RoomState), value);
-            //        switch(roomState)
-            //        {
-            //            case RoomState.Available:
-            //                break;
-            //            case RoomState.Full:
-            //                break;
-            //            case RoomState.Started:
-            //                break;
-            //            default:
-            //                Debug.LogWarning("该房间状态不在枚举范围内");
-            //                break;
-            //        }
-            //        Rooms.Add(new RoomInfo(key, i, roomState));
-            //    }
-            //}
+            using (UnityWebRequest request = UnityWebRequest.Get($"{url}GetRooms"))
+            {
+                request.certificateHandler = new WebRequestCertificate();
+                request.downloadHandler = new DownloadHandlerBuffer();
+
+                yield return request.SendWebRequest();
+
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    Debug.Log($"SetRedisValue Success, info:{request.downloadHandler.text}");
+                    string receiveContent = request.downloadHandler.text;
+                    List<RoomInfo> rooms = JsonMapper.ToObject<List<RoomInfo>>(receiveContent);
+                }
+                else
+                {
+                    Debug.Log(request.result);
+                }
+            }
         }
     }
 }
