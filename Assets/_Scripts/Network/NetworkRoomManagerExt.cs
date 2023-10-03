@@ -1,11 +1,17 @@
 using kcp2k;
 using Mirror;
+using MoonSharp.Interpreter.Serialization.Json;
 using StackExchange.Redis;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using System.Text;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.XR;
 
 namespace Tabletop
 {
@@ -183,19 +189,40 @@ namespace Tabletop
                     SetPort(port);
                 }
             }
-            NetworkRoomManagerExt.singleton.StartServer();
+            //NetworkRoomManagerExt.singleton.StartServer();
 
             //刚部署时更新Redis
-            SetRedisValue(RoomState.Available);
+            StartCoroutine(SetRedisValue(RoomState.Available));
         }
 
-        public void SetRedisValue(RoomState roomState)
+
+        public readonly string url = "https://localhost:10003/";
+        public IEnumerator SetRedisValue(RoomState roomState)
         {
-            //var db = Conn.GetDatabase();
-            //var key = "Room" + (transport as KcpTransport).port.ToString();
-            //var value = Enum.GetName(typeof(RoomState), roomState);
-            //db.StringSet(key, value);
+            WWWForm form = new WWWForm();
+            form.AddField("port", (transport as KcpTransport).port);
+            form.AddField("state", Enum.GetName(typeof(RoomState), roomState));
+
+            using (UnityWebRequest request = UnityWebRequest.Post($"{url}SetRoomState", form))
+            {
+                request.certificateHandler = new WebRequestCertificate();
+                //被@RequestParam标记了的参数只支持表单，不支持Json格式；@RequestBody标记的参数才支持Json
+                //request.SetRequestHeader("Content-Type", "application/json;charset=utf-8");
+                request.downloadHandler = new DownloadHandlerBuffer();
+
+                yield return request.SendWebRequest();
+
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    Debug.Log($"SetRedisValue Success, info:{request.downloadHandler.text}");
+                }
+                else
+                {
+                    Debug.Log(request.result);
+                }
+            }
         }
+
 
         public List<RoomInfo> Rooms = new List<RoomInfo>();
         public void CheckRoomAvaliable()
