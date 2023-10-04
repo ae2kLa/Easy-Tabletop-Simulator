@@ -51,6 +51,10 @@ namespace Tabletop.Local
             Map.CurrentColor.Value = GoChessColor.Unknown;
             StartCoroutine(piece.ApplyAttachTransform(transform, () =>
             {
+                //高亮最后一次落子
+                Map.LastOutlineObj.Value?.CancelHighlight();
+                Map.LastOutlineObj.Value = piece;
+
                 var rb = piece.transform.GetComponent<Rigidbody>();
                 rb.constraints = RigidbodyConstraints.FreezeAll;
                 rb.freezeRotation = true;

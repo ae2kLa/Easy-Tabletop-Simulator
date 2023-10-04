@@ -31,6 +31,7 @@ namespace Tabletop.Local
         protected Transform AttachParent;
 
         public BindableProperty<GoChessColor> CurrentColor;
+        public BindableProperty<LocalOutLineObj> LastOutlineObj;
 
         public void Awake()
         {
@@ -46,6 +47,15 @@ namespace Tabletop.Local
             CurrentColor.RegisterWithInitValue((color) =>
             {
                 //print($"»ØºÏÂÖ×ª");
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+
+            LastOutlineObj = new BindableProperty<LocalOutLineObj>();
+            LastOutlineObj.RegisterWithInitValue((outlineObj) =>
+            {
+                if(outlineObj != null)
+                {
+                    outlineObj.FreezeHighlight(Color.red);
+                }
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
 
