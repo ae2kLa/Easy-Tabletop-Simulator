@@ -1,18 +1,75 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class LocalOutlineObj : MonoBehaviour
+namespace Tabletop.Local
 {
-    // Start is called before the first frame update
-    void Start()
+    public abstract class LocalOutLineObj : MonoBehaviour
     {
-        
-    }
+        protected Outline m_outline;
+        protected HighLightState m_highLightState;
+        protected Color m_color;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public void Awake()
+        {
+            if (TryGetComponent(out m_outline))
+            {
+                OutlineInit();
+            }
+            Init();
+        }
+
+        protected virtual void Init()
+        {
+
+        }
+
+        protected virtual void OnMouseEnter()
+        {
+            if (m_outline != null && m_highLightState == HighLightState.avaliable)
+                m_outline.enabled = true;
+        }
+
+        protected virtual void OnMouseOver()
+        {
+
+        }
+
+        protected virtual void OnMouseExit()
+        {
+            if (m_outline != null && m_highLightState == HighLightState.avaliable)
+                m_outline.enabled = false;
+        }
+
+        public virtual void OnMouseDown()
+        {
+
+        }
+
+        public void OutlineInit()
+        {
+            m_outline.enabled = false;
+            m_color = m_outline.OutlineColor;
+            m_highLightState = HighLightState.avaliable;
+        }
+
+        public void FreezeHighlight(Color color)
+        {
+            if (m_outline != null)
+            {
+                m_highLightState = HighLightState.freeze;
+                m_outline.OutlineColor = color;
+                m_outline.enabled = true;
+            }
+        }
+
+        public void CancelHighlight()
+        {
+            if (m_outline != null)
+            {
+                m_highLightState = HighLightState.avaliable;
+                m_outline.OutlineColor = m_color;
+                m_outline.enabled = false;
+            }
+        }
+
     }
 }

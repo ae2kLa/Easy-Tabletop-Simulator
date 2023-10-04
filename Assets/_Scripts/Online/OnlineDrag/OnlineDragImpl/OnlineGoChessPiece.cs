@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Tabletop.Online
 {
-    public class OnlineGoChessPiece : OnlineDragObject
+    public class OnlineGoChessPiece : OnlineDragObj
     {
         //ºÚ°×Á½·½
         public GoChessColor m_virtualColor;

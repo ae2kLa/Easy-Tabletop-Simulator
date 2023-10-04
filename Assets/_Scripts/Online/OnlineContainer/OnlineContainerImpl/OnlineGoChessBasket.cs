@@ -11,7 +11,7 @@ namespace Tabletop.Online
             ContainTypes.Add(typeof(OnlineGoChessPiece));
         }
 
-        protected override bool AddCondition(OnlineDragObject dragObj)
+        protected override bool AddCondition(OnlineDragObj dragObj)
         {
             if (dragObj is not OnlineGoChessPiece)
             {
@@ -25,7 +25,7 @@ namespace Tabletop.Online
         }
 
         [Server]
-        protected override void AfterGenerate(OnlineDragObject dragObj)
+        protected override void AfterGenerate(OnlineDragObj dragObj)
         {
             if (dragObj is OnlineGoChessPiece)
             {

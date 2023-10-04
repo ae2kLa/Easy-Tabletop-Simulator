@@ -1,14 +1,9 @@
-using Mirror;
 using QFramework;
 using UnityEngine;
 
-
-namespace Tabletop.Online
+namespace Tabletop.Local
 {
-    /// <summary>
-    /// 记录当前对局到哪一方回合
-    /// </summary>
-    public class OnlineMapObject : NetworkBehaviour
+    public class LocalMapObj : MonoBehaviour
     {
         public GameObject AttachPrefab;
 
@@ -30,17 +25,14 @@ namespace Tabletop.Online
         [SerializeField]
         protected Vector3 offset;
 
-        protected EasyGrid<OnlineGridData> m_grids;
-        public EasyGrid<OnlineGridData> Grids => m_grids;
-
-        protected bool ServerStarted = false;
+        protected EasyGrid<LocalGridData> m_grids;
+        public EasyGrid<LocalGridData> Grids => m_grids;
 
         protected Transform AttachParent;
 
-        //TODO:这个字段届时当下沉到子类
         public BindableProperty<GoChessColor> CurrentColor;
 
-        public override void OnStartServer()
+        public void Awake()
         {
             if (AttachParent == null)
             {
@@ -49,48 +41,38 @@ namespace Tabletop.Online
             }
 
             MapInit();
+
             CurrentColor = new BindableProperty<GoChessColor>(GoChessColor.Black);
             CurrentColor.RegisterWithInitValue((color) =>
             {
-                //TODO:首回合还没能显示
-                OnlinePlayerManager.Instance.ForEach((player) =>
-                {
-                    if (player.CurrentColor == color)
-                        OnlinePlayerManager.Instance.SendMsg(player.netId, $"现在到你的回合了");
-                });
-            });
-            ServerStarted = true;
+                //print($"回合轮转");
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
 
-        [Server]
         public void MapInit()
         {
-            m_grids = new EasyGrid<OnlineGridData>(width, height);
+            m_grids = new EasyGrid<LocalGridData>(width, height);
 
             m_grids.ForEach((x, z, _) =>
             {
-                m_grids[x, z] = new OnlineGridData(x, z, transform, offset, gridSize);
+                m_grids[x, z] = new LocalGridData(x, z, transform, offset, gridSize);
                 var attachAreaGO = GameObject.Instantiate(AttachPrefab, m_grids[x, z].WorldPos, Quaternion.identity, AttachParent);
-
-                //客户端无需生成
-                //NetworkServer.Spawn(attachArea, connectionToClient);
-
-                var attachArea = attachAreaGO.GetComponent<OnlineAttachArea>();
-                attachArea.Grids = this.Grids;
+                var attachArea = attachAreaGO.GetComponent<LocalAttachArea>();
+                m_grids[x, z].AttachArea = attachArea;
+                attachArea.Grids = Grids;
                 attachArea.Grid = m_grids[x, z];
                 attachArea.Map = this;
             });
         }
 
-
-        public void RestartGame(uint playerNid)
+        public void RestartGame()
         {
             m_grids.ForEach((x, z, grid) =>
             {
                 grid.Occupied = false;
                 if (grid.DragObject != null)
                 {
-                    grid.DragObject.Restart(playerNid);
+                    grid.DragObject.Restart();
                     grid.DragObject = null;
                 }
             });
@@ -99,8 +81,6 @@ namespace Tabletop.Online
 
         private void Update()
         {
-            if (!ServerStarted) return;
-
             Draw();
         }
 

@@ -11,7 +11,7 @@ namespace Tabletop.Online
         protected Collider m_collider;
         public Collider Collider => m_collider;
 
-        public List<OnlineDragObject> Contents = new List<OnlineDragObject>();
+        public List<OnlineDragObj> Contents = new List<OnlineDragObj>();
         protected List<Type> ContainTypes = new List<Type>();
 
         [ToggleLeft]
@@ -19,7 +19,7 @@ namespace Tabletop.Online
         [EnableIf("CountUnlimitedToggle")]
         public GameObject CountUnlimitedPrefab;
 
-        public OnlineDragObject CurrentDragObj = null;
+        public OnlineDragObj CurrentDragObj = null;
 
         public override void OnStartServer()
         {
@@ -36,7 +36,7 @@ namespace Tabletop.Online
             AddContainTypes();
             foreach (var subClassType in ContainTypes)
             {
-                if (CountUnlimitedPrefab.TryGetComponent(out OnlineDragObject dragObject))
+                if (CountUnlimitedPrefab.TryGetComponent(out OnlineDragObj dragObject))
                 {
                     if (!dragObject.GetType().Equals(subClassType))
                     {
@@ -50,14 +50,14 @@ namespace Tabletop.Online
         /// Example: ContainTypes.Add(typeof(subClass of DragObject));
         /// </summary>
         protected abstract void AddContainTypes();
-        protected abstract bool AddCondition(OnlineDragObject dragObj);
+        protected abstract bool AddCondition(OnlineDragObj dragObj);
 
-        public void Attach(uint playerNid, OnlineDragObject dragObject)
+        public void Attach(uint playerNid, OnlineDragObj dragObject)
         {
             Add(playerNid, dragObject);
         }
 
-        public void Add(uint playerNid, OnlineDragObject dragObject)
+        public void Add(uint playerNid, OnlineDragObj dragObject)
         {
             if (!ContainTypes.Contains(dragObject.GetType()) || !AddCondition(dragObject))
             {
@@ -102,7 +102,7 @@ namespace Tabletop.Online
                     var go = Instantiate(CountUnlimitedPrefab,
                         transform.position + Vector3.up * 1f, Quaternion.identity);
                     NetworkServer.Spawn(go, connectionToClient);
-                    CurrentDragObj = go.GetComponent<OnlineDragObject>();
+                    CurrentDragObj = go.GetComponent<OnlineDragObj>();
                     CurrentDragObj.Container = this;
                     AfterGenerate(CurrentDragObj);
                 }
@@ -125,7 +125,7 @@ namespace Tabletop.Online
             CurrentDragObj.RpcBeGet();
         }
 
-        protected virtual void AfterGenerate(OnlineDragObject dragObj)
+        protected virtual void AfterGenerate(OnlineDragObj dragObj)
         {
 
         }

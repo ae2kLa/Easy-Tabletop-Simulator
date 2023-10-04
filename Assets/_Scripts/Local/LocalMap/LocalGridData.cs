@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace Tabletop.Online
+namespace Tabletop.Local
 {
-    public class OnlineGridData
+    public class LocalGridData
     {
-        public OnlineGridData(int x, int z, Transform parentTrans, Vector3 offset, float size = 1f)
+        public LocalGridData(int x, int z, Transform parentTrans, Vector3 offset, float size = 1f)
         {
             X = x;
             Z = z;
@@ -14,6 +14,11 @@ namespace Tabletop.Online
         }
 
         /// <summary>
+        /// 对应的吸附区域是哪个
+        /// </summary>
+        public LocalIAttachable AttachArea;
+
+        /// <summary>
         /// 是否被占领/吸附
         /// </summary>
         public bool Occupied;
@@ -21,7 +26,7 @@ namespace Tabletop.Online
         /// <summary>
         /// 吸附在上面的物体
         /// </summary>
-        public OnlineDragObj DragObject;
+        public LocalDragObj DragObject;
 
         /// <summary>
         /// 当前格对应的局部坐标
@@ -53,4 +58,5 @@ namespace Tabletop.Online
         /// </summary>
         public int Z;
     }
+
 }

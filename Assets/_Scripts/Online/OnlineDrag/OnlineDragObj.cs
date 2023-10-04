@@ -11,7 +11,7 @@ namespace Tabletop.Online
     /// <summary>
     /// 可拖拽的物体一定有碰撞体
     /// </summary>
-    public abstract class OnlineDragObject : OnlineOutLineObj
+    public abstract class OnlineDragObj : OnlineOutLineObj
     {
         protected Rigidbody m_rigidbody;
         protected Collider m_collider;

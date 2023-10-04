@@ -11,14 +11,14 @@ namespace Tabletop.Online
         /// <summary>
         /// 属于哪个Grids
         /// </summary>
-        public EasyGrid<OnlineGridData> Grids;
+        [HideInInspector] public EasyGrid<OnlineGridData> Grids;
 
         /// <summary>
         /// 该格对应哪个GridData
         /// </summary>
-        public OnlineGridData Grid;
+        [HideInInspector] public OnlineGridData Grid;
 
-        public OnlineMapObject Map;
+        [HideInInspector] public OnlineMapObj Map;
 
         public override void OnStartServer()
         {
@@ -31,7 +31,7 @@ namespace Tabletop.Online
         }
 
 
-        public void Attach(uint playerNid, OnlineDragObject dragObject)
+        public void Attach(uint playerNid, OnlineDragObj dragObject)
         {
             //TODO:这个方法届时当下沉到子类
             var piece = dragObject as OnlineGoChessPiece;

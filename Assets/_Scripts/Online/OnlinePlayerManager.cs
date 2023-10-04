@@ -108,7 +108,7 @@ namespace Tabletop.Online
 
         public void RestartGame()
         {
-            OnlineMapObject[] maps = GameObject.FindObjectsOfType<OnlineMapObject>();
+            OnlineMapObj[] maps = GameObject.FindObjectsOfType<OnlineMapObj>();
 
             foreach(var map in maps)
             {

@@ -341,8 +341,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1544291538}
+  - component: {fileID: 1544291539}
   m_Layer: 0
-  m_Name: PlayManager
+  m_Name: PracticeManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -363,6 +364,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1544291539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544291535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b088677f4a8a8d6469d973d481cf00c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BlackBasket: {fileID: 4727611908957703281, guid: 0c4f47cf387da9146991286af7f48f19, type: 3}
+  WhiteBasket: {fileID: 89194192435950677, guid: 8ab7f14b61ca30e4898524b97bdc1e78, type: 3}
+  Map: {fileID: 5737543506020484293, guid: f15ed92a3ca44b94e81bcd11197f6137, type: 3}
+  PlayerColor: 1
 --- !u!1001 &1580363550
 PrefabInstance:
   m_ObjectHideFlags: 0
