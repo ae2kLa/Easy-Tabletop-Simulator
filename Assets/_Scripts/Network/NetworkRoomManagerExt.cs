@@ -33,12 +33,6 @@ namespace Tabletop
         public override void Update()
         {
             base.Update();
-
-            //按C扫描房间
-            if(Input.GetKeyDown(KeyCode.C))
-            {
-                StartCoroutine(CheckRoomAvaliable());
-            }
         }
 
         /// <summary>
@@ -52,6 +46,7 @@ namespace Tabletop
             {
                 //开始游戏时更新Redis
                 SetRedisValue(RoomState.Started);
+                oppositeDisconnect = false;
             }
         }
 
@@ -115,6 +110,13 @@ namespace Tabletop
             }
 
             GUILayout.BeginArea(new Rect(0, 300, Screen.width, Screen.height));
+            if (GUI.Button(new Rect(20, 40, 100, 20), "刷新房间"))
+            {
+                StartCoroutine(CheckRoomAvaliable());
+            }
+            GUILayout.EndArea();
+
+            GUILayout.BeginArea(new Rect(0, 500, Screen.width, Screen.height));
             for (int i = 0; i < Rooms.Count; i++)
             {
                 if (GUI.Button(new Rect(20 + i * 100, 40, 100, 20), Rooms[i].Name + Rooms[i].State.ToString()))
@@ -135,7 +137,7 @@ namespace Tabletop
         }
 
 
-        bool disconnect = false;
+        bool oppositeDisconnect = false;
         public override void OnServerDisconnect(NetworkConnectionToClient conn)
         {
             //魔改
@@ -146,9 +148,9 @@ namespace Tabletop
             {
                 PlayerManager.Instance.Remove(player);
 
-                if(!disconnect)
+                if (!oppositeDisconnect)
                 {
-                    disconnect = true;
+                    oppositeDisconnect = true;
                     NetworkServer.SendToReady(new OppositeExitMessage()
                     {
                         MsgContent = $"玩家Nid:{player.netId}退出"
@@ -187,7 +189,7 @@ namespace Tabletop
                     SetPort(port);
                 }
             }
-            //NetworkRoomManagerExt.singleton.StartServer();
+            NetworkRoomManagerExt.singleton.StartServer();
 
             //刚部署时更新Redis
             StartCoroutine(SetRedisValue(RoomState.Available));
