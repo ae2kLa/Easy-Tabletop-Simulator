@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2048103063106554189}
   - component: {fileID: 2048103063106554190}
   m_Layer: 6
-  m_Name: DragObjClone
+  m_Name: OnlineDragObjClone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

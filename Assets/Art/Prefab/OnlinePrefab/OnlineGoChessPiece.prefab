@@ -113,7 +113,7 @@ GameObject:
   - component: {fileID: 4480539010470530145}
   - component: {fileID: 4480539010470530144}
   m_Layer: 6
-  m_Name: GoChessPiece
+  m_Name: OnlineGoChessPiece
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
