@@ -9,6 +9,8 @@ namespace Tabletop.Local
     {
         public LocalGobangRobot(GoChessColor color, LocalGoChessBasket chessBasket, LocalMapObj map)
         {
+            InitValueMap();
+
             m_robotColor = color;
             m_chessBasket = chessBasket;
             m_map = map;
@@ -41,6 +43,40 @@ namespace Tabletop.Local
             var piece = m_chessBasket.Get(m_robotColor);
             m_map.Grids[x, z].AttachArea.Attach(piece);
         }
+
+        private void CalculateValue()
+        {
+
+
+
+        }
+
+        private Dictionary<string, int> m_valueMap;
+        private void InitValueMap()
+        {
+            m_valueMap = new Dictionary<string, int>();
+
+            //¿Õ-0£»ºÚ-1£»°×-2
+            m_valueMap["1"] = 20;
+            m_valueMap["11"] = 400;
+            m_valueMap["111"] = 500;
+            m_valueMap["1111"] = 8000;
+            m_valueMap["2"] = 20;
+            m_valueMap["22"] = 400;
+            m_valueMap["222"] = 500;
+            m_valueMap["2222"] = 8000;
+
+            m_valueMap["12"] = 8;
+            m_valueMap["112"] = 80;
+            m_valueMap["1112"] = 450;
+            m_valueMap["11112"] = 8000;
+
+            m_valueMap["21"] = 8;
+            m_valueMap["221"] = 80;
+            m_valueMap["2221"] = 450;
+            m_valueMap["22221"] = 8000;
+        }
+
 
     }
 }

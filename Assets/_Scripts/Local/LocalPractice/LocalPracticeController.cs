@@ -44,11 +44,6 @@ namespace Tabletop.Local
             }
         }
 
-
-        private void Update()
-        {
-            
-        }
     }
 
 }
