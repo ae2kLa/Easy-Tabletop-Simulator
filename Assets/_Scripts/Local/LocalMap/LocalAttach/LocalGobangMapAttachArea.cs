@@ -44,26 +44,7 @@ namespace Tabletop.Local
                 rb.constraints = RigidbodyConstraints.FreezeAll;
                 rb.freezeRotation = true;
 
-                //TODO:这个方法届时当下沉到子类
-                if (Map.GameReferee.CheckWin(piece.VirtualColor, Grid, Grids))
-                {
-                    print("检测到五子连成一线");
-
-                    //通知某方胜利
-                    LocalPracticeController.Instance.WinEvent.Trigger(piece.VirtualColor);
-                    Map.CurrentColor.Value = GoChessColor.Unknown;
-                    return;
-                }
-
-                //回合转换
-                if (currentColor == GoChessColor.Black)
-                {
-                    Map.CurrentColor.Value = GoChessColor.White;
-                }
-                else if (currentColor == GoChessColor.White)
-                {
-                    Map.CurrentColor.Value = GoChessColor.Black;
-                }
+                Map.OnPieceDrop(piece.VirtualColor, Grid, Grids);
             }));
         }
     }

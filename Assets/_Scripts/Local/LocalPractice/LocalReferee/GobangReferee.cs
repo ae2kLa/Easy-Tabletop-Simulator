@@ -5,22 +5,48 @@ namespace Tabletop.Local
 {
     public class GobangReferee: IReferee
     {
-        public bool CheckWin(GoChessColor color, LocalGridData grid, EasyGrid<LocalGridData> grids)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="grid"></param>
+        /// <param name="grids"></param>
+        /// <param name="map"></param>
+        public void OnPieceDrop(LocalGridData grid, EasyGrid<LocalGridData> grids, LocalMapObj map)
         {
+            var piece = grid.DragObject as LocalGoChessPiece;
+            var pieceColor = piece.VirtualColor;
             var centerPos = new Vector2Int(grid.X, grid.Z);
 
             bool res =
-            CheckSingleLine(centerPos, new Vector2Int(1, -1), color, grids) ||
-            CheckSingleLine(centerPos, new Vector2Int(0, -1), color, grids) ||
-            CheckSingleLine(centerPos, new Vector2Int(-1, -1), color, grids) ||
-            CheckSingleLine(centerPos, new Vector2Int(1, 0), color, grids);
+            CheckSingleLine(centerPos, new Vector2Int(1, -1), pieceColor, grids) ||
+            CheckSingleLine(centerPos, new Vector2Int(0, -1), pieceColor, grids) ||
+            CheckSingleLine(centerPos, new Vector2Int(-1, -1), pieceColor, grids) ||
+            CheckSingleLine(centerPos, new Vector2Int(1, 0), pieceColor, grids);
 
-            return res;
+            if (res)
+            {
+                Debug.Log("检测到五子连成一线");
+
+                //通知某方胜利
+                LocalPracticeController.Instance.WinEvent.Trigger(piece.VirtualColor);
+                map.CurrentColor.Value = GoChessColor.Unknown;
+                return;
+            }
+
+            //回合转换
+            if (pieceColor == GoChessColor.Black)
+            {
+                map.CurrentColor.Value = GoChessColor.White;
+            }
+            else if (pieceColor == GoChessColor.White)
+            {
+                map.CurrentColor.Value = GoChessColor.Black;
+            }
         }
 
 
         /// <summary>
-        /// 
+        /// 裁判长连算法
         /// </summary>
         /// <param name="centerPos"></param>
         /// <param name="direction"></param>

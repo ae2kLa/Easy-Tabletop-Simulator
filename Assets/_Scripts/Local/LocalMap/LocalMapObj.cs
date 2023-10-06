@@ -33,7 +33,10 @@ namespace Tabletop.Local
         public BindableProperty<GoChessColor> CurrentColor;
         public BindableProperty<LocalOutLineObj> LastOutlineObj;
 
-        public IReferee GameReferee;
+        /// <summary>
+        /// TODO:选择模式后注入
+        /// </summary>
+        private IReferee m_gameReferee;
 
         public void Awake()
         {
@@ -60,7 +63,7 @@ namespace Tabletop.Local
                 }
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
-            GameReferee = new GobangReferee();
+            m_gameReferee = new GobangReferee();
         }
 
         public void MapInit()
@@ -77,6 +80,11 @@ namespace Tabletop.Local
                 attachArea.Grid = m_grids[x, z];
                 attachArea.Map = this;
             });
+        }
+
+        public void OnPieceDrop(LocalGridData grid, EasyGrid<LocalGridData> grids)
+        {
+            m_gameReferee.OnPieceDrop(grid, grids, this);
         }
 
         public void RestartGame()
