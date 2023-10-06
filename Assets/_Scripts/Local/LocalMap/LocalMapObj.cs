@@ -99,6 +99,11 @@ namespace Tabletop.Local
             m_gameRetarter.RetractLastStep();
         }
 
+        public void RetractAll()
+        {
+            m_gameRetarter.RetractAll();
+        }
+
         public void RestartGame()
         {
             m_grids.ForEach((x, z, grid) =>

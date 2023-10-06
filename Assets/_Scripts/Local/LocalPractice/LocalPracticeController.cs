@@ -71,8 +71,8 @@ namespace Tabletop.Local
             if (win && GUI.Button(new Rect(40, 40, 300, 20), winMsg))
             {
                 win = false;
-                //所有棋子返回棋篓
-
+                m_map.RetractAll();
+                m_map.CurrentColor.Value = PlayerColor;
             }
 
             GUILayout.EndArea();
