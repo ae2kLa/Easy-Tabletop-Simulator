@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Tabletop.Local
 {
-    public abstract class LocalContainerObj : LocalOutLineObj
+    public abstract class LocalContainerObj : LocalOutLineObj, LocalIAttachable
     {
         protected Collider m_collider;
         public Collider Collider => m_collider;

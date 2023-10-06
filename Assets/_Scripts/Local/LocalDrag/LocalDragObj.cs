@@ -148,7 +148,7 @@ namespace Tabletop.Local
             RaycastHit[] hits = Physics.RaycastAll(ray);
             foreach (RaycastHit hit in hits)
             {
-                //Debug.Log($"¼ì²âµ½AttachObj{hit.collider.transform.name}");
+                //Debug.Log($"¼ì²âµ½AttachObj: {hit.collider.transform.name}");
 
                 Transform hitObjTrans = hit.collider.transform;
                 LocalIAttachable attachObj = null;

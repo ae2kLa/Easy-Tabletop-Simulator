@@ -134,12 +134,7 @@ namespace Tabletop.Online
 
             var yOffset = new Vector3(0, m_collider.bounds.center.y - m_collider.bounds.min.y, 0);
             transform.position = hitPos + yOffset;
-            //else
-            //{
-            //    //CmdSetPosition(Vector3Utils.GetPlaneInteractivePoint(screenPos, transform.position.y));
-            //}
         }
-
 
         public void OnMouseUp()
         {
