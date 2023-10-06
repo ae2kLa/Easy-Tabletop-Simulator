@@ -1,3 +1,4 @@
+using QFramework;
 using UnityEngine;
 
 namespace Tabletop.Local
@@ -11,6 +12,8 @@ namespace Tabletop.Local
         public static LocalPracticeController Instance;
         public GoChessColor PlayerColor;
         private IRobot m_robot;
+
+        public EasyEvent<GoChessColor> WinEvent;
 
         public void Awake()
         {
@@ -26,6 +29,8 @@ namespace Tabletop.Local
             m_blackBasket = Instantiate(BlackBasket).GetComponent<LocalGoChessBasket>();
             m_whiteBasket = Instantiate(WhiteBasket).GetComponent<LocalGoChessBasket>();
             m_map = Instantiate(Map).GetComponent<LocalMapObj>();
+
+            WinEvent = new EasyEvent<GoChessColor>();
         }
 
         private void Start()

@@ -33,6 +33,8 @@ namespace Tabletop.Local
         public BindableProperty<GoChessColor> CurrentColor;
         public BindableProperty<LocalOutLineObj> LastOutlineObj;
 
+        public IReferee GameReferee;
+
         public void Awake()
         {
             if (AttachParent == null)
@@ -57,6 +59,8 @@ namespace Tabletop.Local
                     outlineObj.FreezeHighlight(Color.red);
                 }
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
+
+            GameReferee = new GobangReferee();
         }
 
         public void MapInit()
@@ -67,7 +71,7 @@ namespace Tabletop.Local
             {
                 m_grids[x, z] = new LocalGridData(x, z, transform, offset, gridSize);
                 var attachAreaGO = GameObject.Instantiate(AttachPrefab, m_grids[x, z].WorldPos, Quaternion.identity, AttachParent);
-                var attachArea = attachAreaGO.GetComponent<LocalAttachArea>();
+                var attachArea = attachAreaGO.GetComponent<LocalMapAttachArea>();
                 m_grids[x, z].AttachArea = attachArea;
                 attachArea.Grids = Grids;
                 attachArea.Grid = m_grids[x, z];

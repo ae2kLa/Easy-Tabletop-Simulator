@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6521220145117067991}
   - component: {fileID: 6521220145117067990}
   - component: {fileID: 6521220145117067995}
-  - component: {fileID: 4858045671538862222}
+  - component: {fileID: 4114859328803146004}
   m_Layer: 6
   m_Name: LocalAttachArea
   m_TagString: Untagged
@@ -117,7 +117,7 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
---- !u!114 &4858045671538862222
+--- !u!114 &4114859328803146004
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -126,8 +126,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6521220145117067989}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e70c305cf80e1744b8382a353b093c6, type: 3}
+  m_Script: {fileID: 11500000, guid: c3ab71de51266834f93371b119f974e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Grid: {fileID: 0}
   Map: {fileID: 0}
