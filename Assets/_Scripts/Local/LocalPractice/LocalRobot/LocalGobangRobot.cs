@@ -90,18 +90,37 @@ namespace Tabletop.Local
         private int GetWeight(LocalGridData gridData, Vector2Int direction)
         {
             string situation = "";
-            Vector2Int pos = new Vector2Int(gridData.X, gridData.Z);
-            while (pos.x >= 0 && pos.x < m_map.Grids.Width && pos.y >= 0 && pos.y < m_map.Grids.Height)
+            Vector2Int pos = new Vector2Int(gridData.X, gridData.Z) + direction;
+
+            //向某个方向最多遍历五枚棋子
+            int gridCnt = 0;
+            int gridMax = 5;
+            while (pos.x >= 0 && pos.x < m_map.Grids.Width && pos.y >= 0 && pos.y < m_map.Grids.Height
+                && gridCnt < gridMax)
             {
                 if (!m_map.Grids[pos.x, pos.y].Occupied) break;
 
                 if (m_map.Grids[pos.x, pos.y].DragObject is LocalGoChessPiece piece)
                 {
-                    situation += ((int)piece.VirtualColor).ToString();
+                    if(piece.VirtualColor == GoChessColor.Black)
+                        situation += "1";
+                    else if (piece.VirtualColor == GoChessColor.White)
+                        situation += "2";
                 }
+
+                pos += direction;
+                gridCnt++;
             }
-            Debug.Log("m_weightHashMap[situation:" + m_weightHashMap[situation]);
-            return m_weightHashMap[situation];
+
+            if (!m_weightHashMap.ContainsKey(situation))
+            {
+                return 0;
+            }
+            else
+            {
+                //Debug.Log("m_weightHashMap[situation:" + m_weightHashMap[situation]);
+                return m_weightHashMap[situation];
+            }
         }
 
         private int m_maxWeight = 0;

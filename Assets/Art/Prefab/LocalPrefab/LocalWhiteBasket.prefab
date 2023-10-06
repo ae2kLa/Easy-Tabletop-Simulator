@@ -81,11 +81,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 608e3458f03181a468297fffae59c357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Contents: []
   CountUnlimitedToggle: 1
   CountUnlimitedPrefab: {fileID: 3670288201562288436, guid: b88771cc44403984b862380796ad1fb5, type: 3}
   CurrentDragObj: {fileID: 0}
-  ContainGoChessColor: 0
+  ContainGoChessColor: 2
   PlayerGoChessColor: 2
 --- !u!1 &1201766134612228213
 GameObject:
