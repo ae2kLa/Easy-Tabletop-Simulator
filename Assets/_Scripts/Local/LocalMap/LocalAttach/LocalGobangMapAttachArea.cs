@@ -23,7 +23,7 @@ namespace Tabletop.Local
                     print($"当前是白子回合，黑子落子无效");
 
                 //落子无效时自动将棋子移回棋篓
-                StartCoroutine(piece.RecycleDragObject());
+                piece.RecycleFromContainer();
                 return;
             }
 
@@ -45,6 +45,7 @@ namespace Tabletop.Local
                 rb.freezeRotation = true;
 
                 Map.OnPieceDrop(Grid, Grids);
+                Map.OnRecordStep(this);
             }));
         }
     }

@@ -31,7 +31,6 @@ namespace Tabletop.Local
             m_map = Instantiate(Map).GetComponent<LocalMapObj>();
 
 
-
             WinEvent = new EasyEvent<GoChessColor>();
             WinEvent.Register((winColor) =>
             {
@@ -63,16 +62,20 @@ namespace Tabletop.Local
         private string winMsg;
         private void OnGUI()
         {
-            if(win)
+            GUILayout.BeginArea(new Rect(0, 200, Screen.width, Screen.height));
+
+            if (m_map.CurrentColor.Value == PlayerColor && GUI.Button(new Rect(0, 40, 300, 20), "悔棋"))
             {
-                GUILayout.BeginArea(new Rect(0, 300, Screen.width, Screen.height));
-                if (GUI.Button(new Rect(20, 40, 300, 20), winMsg))
-                {
-                    win = false;
-                    //所有棋子返回棋篓
-                }
-                GUILayout.EndArea();
+                m_map.RetractLastStep();
             }
+            if (win && GUI.Button(new Rect(40, 40, 300, 20), winMsg))
+            {
+                win = false;
+                //所有棋子返回棋篓
+
+            }
+
+            GUILayout.EndArea();
         }
 
     }

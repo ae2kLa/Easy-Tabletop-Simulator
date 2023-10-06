@@ -37,6 +37,7 @@ namespace Tabletop.Local
         /// TODO:选择模式后注入
         /// </summary>
         private IReferee m_gameReferee;
+        private LocalIRetract m_gameRetarter;
 
         public void Awake()
         {
@@ -64,6 +65,7 @@ namespace Tabletop.Local
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
             m_gameReferee = new GobangReferee();
+            m_gameRetarter = new LocalGobangRetracter();
         }
 
         public void MapInit()
@@ -87,6 +89,16 @@ namespace Tabletop.Local
             m_gameReferee.OnPieceDrop(grid, grids, this);
         }
 
+        public void OnRecordStep(LocalMapAttachArea attachArea)
+        {
+            m_gameRetarter.RecordStep(attachArea);
+        }
+
+        public void RetractLastStep()
+        {
+            m_gameRetarter.RetractLastStep();
+        }
+
         public void RestartGame()
         {
             m_grids.ForEach((x, z, grid) =>
@@ -94,7 +106,7 @@ namespace Tabletop.Local
                 grid.Occupied = false;
                 if (grid.DragObject != null)
                 {
-                    grid.DragObject.Restart();
+                    grid.DragObject.RecycleFromContainer();
                     grid.DragObject = null;
                 }
             });

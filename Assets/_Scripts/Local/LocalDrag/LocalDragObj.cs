@@ -206,7 +206,7 @@ namespace Tabletop.Local
         }
 
 
-        public virtual IEnumerator RecycleDragObject(UnityAction callback = null)
+        protected virtual IEnumerator RecycleDragObject(UnityAction callback = null)
         {
             //回收时取消高光显示
             CancelHighlight();
@@ -258,7 +258,7 @@ namespace Tabletop.Local
             gameObject.SetActive(true);
         }
 
-        public void Restart()
+        public void RecycleFromContainer()
         {
             StartCoroutine(RecycleDragObject());
         }

@@ -57,6 +57,12 @@ namespace Tabletop.Local
         /// 在棋盘中的z坐标
         /// </summary>
         public int Z;
+
+        public void ClearOccupied()
+        {
+            Occupied = false;
+            DragObject = null;
+        }
     }
 
 }
