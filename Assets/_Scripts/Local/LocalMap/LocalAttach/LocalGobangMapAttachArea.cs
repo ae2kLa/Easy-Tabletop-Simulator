@@ -44,7 +44,7 @@ namespace Tabletop.Local
                 rb.constraints = RigidbodyConstraints.FreezeAll;
                 rb.freezeRotation = true;
 
-                Map.OnPieceDrop(piece.VirtualColor, Grid, Grids);
+                Map.OnPieceDrop(Grid, Grids);
             }));
         }
     }
