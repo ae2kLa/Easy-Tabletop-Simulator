@@ -42,6 +42,7 @@ namespace Tabletop.Local
             {
                 map.CurrentColor.Value = GoChessColor.Black;
             }
+            map.CurrentTurnCnt.Value += 1;
         }
 
 

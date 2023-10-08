@@ -31,6 +31,7 @@ namespace Tabletop.Local
         protected Transform AttachParent;
 
         public BindableProperty<GoChessColor> CurrentColor;
+        public BindableProperty<int> CurrentTurnCnt;
         public BindableProperty<LocalOutLineObj> LastOutlineObj;
 
         /// <summary>
@@ -49,10 +50,18 @@ namespace Tabletop.Local
 
             MapInit();
 
+            //黑方先手
             CurrentColor = new BindableProperty<GoChessColor>(GoChessColor.Black);
             CurrentColor.RegisterWithInitValue((color) =>
             {
                 //print($"回合轮转");
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+
+            //黑方先行第一手
+            CurrentTurnCnt = new BindableProperty<int>(1);
+            CurrentTurnCnt.RegisterWithInitValue((turnCnt) =>
+            {
+                //print($"第{turnCnt}手");
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
             LastOutlineObj = new BindableProperty<LocalOutLineObj>();

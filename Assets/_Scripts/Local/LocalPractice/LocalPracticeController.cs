@@ -64,7 +64,7 @@ namespace Tabletop.Local
         {
             GUILayout.BeginArea(new Rect(0, 200, Screen.width, Screen.height));
 
-            if (m_map.CurrentColor.Value == PlayerColor && GUI.Button(new Rect(0, 40, 300, 20), "悔棋"))
+            if (m_map.CurrentTurnCnt.Value != 1 && m_map.CurrentColor.Value == PlayerColor && GUI.Button(new Rect(0, 40, 300, 20), "悔棋"))
             {
                 m_map.RetractLastStep();
             }
@@ -75,6 +75,7 @@ namespace Tabletop.Local
                 m_map.CurrentColor.Value = PlayerColor;
             }
 
+            GUI.Label(new Rect(0, 80, 300, 20), $"当前第{m_map.CurrentTurnCnt.Value}手");
             GUILayout.EndArea();
         }
 

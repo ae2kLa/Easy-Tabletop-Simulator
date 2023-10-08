@@ -28,6 +28,8 @@ namespace Tabletop.Local
                 dragObj.RecycleFromContainer();
                 attachArea.Grid.ClearOccupied();
 
+                attachArea.Map.CurrentTurnCnt.Value -= 1;
+
                 i++;
             }
         }
@@ -41,6 +43,9 @@ namespace Tabletop.Local
                 var attachArea = attachAreas.Pop();
                 var dragObj = attachArea.Grid.DragObject;
                 dragObj.RecycleFromContainer();
+
+                attachArea.Map.CurrentTurnCnt.Value = 0;
+
                 attachArea.Grid.ClearOccupied();
             }
         }
