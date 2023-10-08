@@ -1,6 +1,7 @@
 using QFramework;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Tabletop.Local
@@ -47,10 +48,10 @@ namespace Tabletop.Local
 
             #region 权值法
 
+            //m_maxX = 0;
+            //m_maxY = 0;
             m_maxWeight = 0;
-            m_maxX = 0;
-            m_maxY = 0;
-            int center = m_map.Grids.Width / 2;
+            m_caculateWeights.Clear();
 
             for (int i = 0; i < m_map.Grids.Width; i++)
             {
@@ -65,19 +66,24 @@ namespace Tabletop.Local
                     {
                         m_weights[i, j] += GetWeight(m_map.Grids[i, j], m_directions[k]);
                     }
-                    ///最后的权值最大点即为AI落子点
-                    if(m_maxWeight < m_weights[i, j])
+
+                    if (m_maxWeight < m_weights[i, j])
                     {
-                        //离棋盘中心越近权重越大
+                        m_caculateWeights.Clear();
                         m_maxWeight = m_weights[i, j];
-                        m_maxX = i;
-                        m_maxY = j;
+                        m_caculateWeights.Add(new CaculateWeight(m_weights[i, j], i, j));
+                    }
+                    else if (m_maxWeight == m_weights[i, j])
+                    {
+                        m_caculateWeights.Add(new CaculateWeight(m_weights[i, j], i, j));
                     }
                 }
             }
 
+            ///最后的权值最大点即为AI落子点，若有多个最大权值则随机。（更好的办法可能是落在靠近棋盘中心的地方）
+            CaculateWeight finalDropPoint = m_caculateWeights.GetRandomItem();
             var piece = m_chessBasket.Get(m_robotColor);
-            m_map.Grids[m_maxX, m_maxY].AttachArea.Attach(piece);
+            m_map.Grids[finalDropPoint.i, finalDropPoint.j].AttachArea.Attach(piece);
 
             #endregion
         }
@@ -125,14 +131,27 @@ namespace Tabletop.Local
             }
         }
 
-        private float m_maxWeight = 0;
-        private int m_maxX = 0;
-        private int m_maxY = 0;
+        private int m_maxWeight = 0;
+        private List<CaculateWeight> m_caculateWeights;
+        public struct CaculateWeight
+        {
+            public int weight;
+            public int i;
+            public int j;
+
+            public CaculateWeight(int w, int x, int y)
+            {
+                weight = w;
+                i = x; 
+                j = y;
+            }
+        }
 
         private EasyGrid<int> m_weights;
         private void InitWeights(int width, int height)
         {
             m_weights = new EasyGrid<int>(width, height);
+            m_caculateWeights = new List<CaculateWeight>();
         }
 
         private Vector2Int[] m_directions = new Vector2Int[]
