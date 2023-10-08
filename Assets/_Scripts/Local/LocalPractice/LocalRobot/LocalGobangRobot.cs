@@ -50,6 +50,7 @@ namespace Tabletop.Local
             m_maxWeight = 0;
             m_maxX = 0;
             m_maxY = 0;
+            int center = m_map.Grids.Width / 2;
 
             for (int i = 0; i < m_map.Grids.Width; i++)
             {
@@ -67,6 +68,7 @@ namespace Tabletop.Local
                     ///最后的权值最大点即为AI落子点
                     if(m_maxWeight < m_weights[i, j])
                     {
+                        //离棋盘中心越近权重越大
                         m_maxWeight = m_weights[i, j];
                         m_maxX = i;
                         m_maxY = j;
@@ -123,7 +125,7 @@ namespace Tabletop.Local
             }
         }
 
-        private int m_maxWeight = 0;
+        private float m_maxWeight = 0;
         private int m_maxX = 0;
         private int m_maxY = 0;
 
@@ -150,25 +152,27 @@ namespace Tabletop.Local
         {
             m_weightHashMap = new Dictionary<string, int>();
 
+            //权值表来源->https://blog.csdn.net/TheBug114514/article/details/115026320
             //空-0；黑-1；白-2
             m_weightHashMap["1"] = 20;
-            m_weightHashMap["11"] = 400;
+            m_weightHashMap["11"] = 410;
             m_weightHashMap["111"] = 500;
             m_weightHashMap["1111"] = 8000;
-            m_weightHashMap["2"] = 20;
-            m_weightHashMap["22"] = 400;
-            m_weightHashMap["222"] = 500;
-            m_weightHashMap["2222"] = 8000;
 
-            m_weightHashMap["12"] = 8;
-            m_weightHashMap["112"] = 80;
+            m_weightHashMap["2"] = 8;
+            m_weightHashMap["22"] = 80;
+            m_weightHashMap["222"] = 470;
+            m_weightHashMap["2222"] = 9000;
+
+            m_weightHashMap["12"] = 4;
+            m_weightHashMap["112"] = 70;
             m_weightHashMap["1112"] = 450;
             m_weightHashMap["11112"] = 8000;
 
-            m_weightHashMap["21"] = 8;
-            m_weightHashMap["221"] = 80;
-            m_weightHashMap["2221"] = 450;
-            m_weightHashMap["22221"] = 8000;
+            m_weightHashMap["21"] = 6;
+            m_weightHashMap["221"] = 60;
+            m_weightHashMap["2221"] = 600;
+            m_weightHashMap["22221"] = 10000;
         }
 
 
