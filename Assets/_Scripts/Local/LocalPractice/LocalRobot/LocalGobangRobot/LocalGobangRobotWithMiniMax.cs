@@ -61,24 +61,21 @@ namespace Tabletop.Local
 
             Debug.Log($"搜索次数:{m_searchCnt}, 剪枝次数:{m_cutCnt}");
 
+            var piece = m_chessBasket.Get(m_robotColor);
             //为null就随机下
-            if (m_targetGrid == null)
+            if (m_allDrops.Count <= 1)
             {
-                var xMax = m_map.Grids.Width;
-                var zMax = m_map.Grids.Height;
-                var x = Random.Range(0, xMax);
-                var z = Random.Range(0, zMax);
-                while (m_map.Grids[x, z].Occupied)
-                {
-                    x = Random.Range(0, xMax);
-                    z = Random.Range(0, zMax);
-                }
-                var piece = m_chessBasket.Get(m_robotColor);
-                m_map.Grids[x, z].AttachArea.Attach(piece);
+                var x = m_map.Grids.Width / 2;
+                var y = m_map.Grids.Height / 2;
+                if(!m_map.Grids[x, y].Occupied)
+                    m_map.Grids[x, y].AttachArea.Attach(piece);
+                else if(Random.Range(0, 100) % 2 == 1)
+                    m_map.Grids[x + 1, y].AttachArea.Attach(piece);
+                else
+                    m_map.Grids[x - 1, y].AttachArea.Attach(piece);
             }
             else
             {
-                var piece = m_chessBasket.Get(m_robotColor);
                 m_targetGrid.AttachArea.Attach(piece);
                 m_targetGrid = null;
             }
@@ -105,7 +102,7 @@ namespace Tabletop.Local
                 return 2 * score;
             }
 
-            var blankList = m_grids.Where(grid => !m_allDrops.Contains(grid)).ToList();
+            var blankList = m_grids.Where(grid => !m_allDrops.Contains(grid) && HasNeightnor(grid)).ToList();
 
             if (currentColor == m_robotColor)
             {
@@ -143,11 +140,12 @@ namespace Tabletop.Local
                         m_targetGrid = grid;
                     }
 
+                    Debug.Log($"剪枝前 alpha: {alpha}, beta: {beta}");
                     alpha = Mathf.Max(alpha, best);
                     //alpha-beta剪枝点
                     if (beta <= alpha)
                     {
-                        Debug.Log($"alpha: {alpha}, beta: {beta}");
+                        Debug.Log($"剪枝时alpha: {alpha}, beta: {beta}");
                         m_cutCnt++;
                         break;
                     }
@@ -214,8 +212,7 @@ namespace Tabletop.Local
             }
 
             score = 0;
-
-            for(int i = 0; i < m_map.Grids.Width; i++)
+            for (int i = 0; i < m_map.Grids.Width; i++)
             {
                 for (int j = 0; j < m_map.Grids.Height; j++)
                 {
@@ -228,36 +225,8 @@ namespace Tabletop.Local
                         }
                         score += myScore;
                     }
-                   
                 }
             }
-
-            //本方得分
-            //int myScore = 0;
-            //for (int i = 0; i < myList.Count; i++)
-            //{
-            //    for(int j = 0; j < m_directions.Length; j++)
-            //    {
-            //       if(CalculateScore(myList[i], m_directions[j], myList, enemyList, out myScore))
-            //       {
-            //            return true;
-            //       }
-            //    }
-            //}
-
-            //int enemyScore = 0;
-            //for (int i = 0; i < enemyList.Count; i++)
-            //{
-            //    for (int j = 0; j < m_directions.Length; j++)
-            //    {
-            //        if (CalculateScore(enemyList[i], m_directions[j], enemyList, myList, out enemyScore))
-            //        {
-            //            return true;
-            //        }
-            //    }
-            //}
-            //score = myScore - enemyScore / 10;
-
             if (targetColor != m_robotColor)
             {
                 score *= -1;
@@ -271,69 +240,66 @@ namespace Tabletop.Local
         {
             score = 0;
 
-            //按某个方向检测形状
-            for (int i = -5; i <= 0; i++)
+            //单向检测形状并统计得分
+            string shape5 = "";
+            string shape6 = "";
+            var x = 0;
+            var y = 0;
+            for (int i = 0; i <= 4; i++)
             {
-                string shape6 = "";
-                for(int j = 0; j <= 5; j++)
+                x = grid.X + i * direction.x;
+                y = grid.Z + i * direction.y;
+                if (0 <= x && x < m_map.Grids.Width && 0 <= y && y < m_map.Grids.Height)
                 {
-                    var x = grid.X + (i + j) * direction.x;
-                    var y = grid.Z + (i + j) * direction.y;
-                    if (0 <= x && x < m_map.Grids.Width && 0 <= y && y < m_map.Grids.Height)
+                    //对方棋子阻隔 或 不成得分棋形 直接return
+                    if (enemyList.Contains(m_map.Grids[x, y]) || shape5.Equals("000"))
                     {
-                        if (enemyList.Contains(m_map.Grids[x, y]))
-                        {
-                            break;
-                        }
-                        else if (myList.Contains(m_map.Grids[x, y]))
-                        {
-                            shape6 += '1';
-                        }
-                        else
-                        {
-                            shape6 += '0';
-                        }
+                        return false;
+                    }
+                    else if (myList.Contains(m_map.Grids[x, y]))
+                    {
+                        shape5 += '1';
+                        shape6 += '1';
+                    }
+                    else
+                    {
+                        shape5 += '0';
+                        shape6 += '0';
                     }
                 }
-                if (m_shapeWeightMap.ContainsKey(shape6))
+                //越界直接return
+                else
                 {
-                    score += m_shapeWeightMap[shape6];
+                    return false;
                 }
             }
 
-            //按某个方向检测形状
-            for (int i = -4; i <= 0; i++)
+            if (m_shapeWeightMap.ContainsKey(shape5))
             {
-                string shape5 = "";
-                for (int j = 0; j <= 4; j++)
-                {
-                    var x = grid.X + (i + j) * direction.x;
-                    var y = grid.Z + (i + j) * direction.y;
-                    if (0 <= x && x < m_map.Grids.Width && 0 <= y && y < m_map.Grids.Height)
-                    {
-                        if (enemyList.Contains(m_map.Grids[x, y]))
-                        {
-                            break;
-                        }
-                        else if (myList.Contains(m_map.Grids[x, y]))
-                        {
-                            shape5 += '1';
-                        }
-                        else
-                        {
-                            shape5 += '0';
-                        }
-                    }
-                }
+                score += m_shapeWeightMap[shape5];
 
-                if (m_shapeWeightMap.ContainsKey(shape5))
+                //长连直接return
+                if (shape5.Equals("11111"))
                 {
-                    score += m_shapeWeightMap[shape5];
-                    if (shape5.Equals("11111"))
-                    {
-                        Debug.Log($"长连, {grid.X}, {grid.Z}");
-                        return true;
-                    }
+                    Debug.Log($"长连, {grid.X}, {grid.Z}");
+                    return true;
+                }
+            }
+
+            x = grid.X + 5 * direction.x;
+            y = grid.Z + 5 * direction.y;
+            if (0 <= x && x < m_map.Grids.Width && 0 <= y && y < m_map.Grids.Height)
+            {
+                if (enemyList.Contains(m_map.Grids[x, y]))
+                    return false;
+                else if (myList.Contains(m_map.Grids[x, y]))
+                    shape6 += '1';
+                else
+                    shape6 += '0';
+
+                if (m_shapeWeightMap.ContainsKey(shape6))
+                {
+                    score += m_shapeWeightMap[shape6];
                 }
             }
 
