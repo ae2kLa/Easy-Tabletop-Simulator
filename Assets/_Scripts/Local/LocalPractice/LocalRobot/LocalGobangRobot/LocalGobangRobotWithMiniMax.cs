@@ -57,10 +57,6 @@ namespace Tabletop.Local
 
             yield return null;
 
-            Minimax(m_robotColor, Depth, float.MinValue, float.MaxValue);
-
-            Debug.Log($"搜索次数:{m_searchCnt}, 剪枝次数:{m_cutCnt}");
-
             var piece = m_chessBasket.Get(m_robotColor);
             //前两手下棋盘中心附近
             if (m_allDrops.Count <= 1)
@@ -76,6 +72,8 @@ namespace Tabletop.Local
             }
             else
             {
+                Minimax(m_robotColor, Depth, float.MinValue, float.MaxValue);
+                Debug.Log($"搜索次数:{m_searchCnt}, 剪枝次数:{m_cutCnt}");
                 m_targetGrid.AttachArea.Attach(piece);
                 m_targetGrid = null;
             }
