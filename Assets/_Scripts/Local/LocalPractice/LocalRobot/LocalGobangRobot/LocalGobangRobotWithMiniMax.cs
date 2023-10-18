@@ -102,16 +102,14 @@ namespace Tabletop.Local
                 return (2 + depth) * score;
             }
 
-            var blankList = m_grids.Where(grid => !m_allDrops.Contains(grid)).ToList();
+            //相邻无棋子则跳过
+            var blankList = m_grids.Where(grid => !m_allDrops.Contains(grid) && HasNeightnor(grid)).ToList();
             LocalGridData bestGrid = null;
             if (currentColor == m_robotColor)
             {
                 float best = float.MinValue;
                 for (int i = 0; i < blankList.Count; i++)
                 {
-                    //此落子处周围无相邻棋子则跳过
-                    if (!HasNeightnor(blankList[i])) continue;
-
                     m_searchCnt++;
                     LocalGridData grid = blankList[i];
 
@@ -141,7 +139,7 @@ namespace Tabletop.Local
 
                     alpha = Mathf.Max(alpha, best);
                     //alpha-beta剪枝点
-                    if (beta < alpha)
+                    if (beta <= alpha)
                     {
                         Debug.Log($"剪枝时alpha: {alpha}, beta: {beta}");
                         m_cutCnt++;
@@ -160,9 +158,6 @@ namespace Tabletop.Local
                 float best = float.MaxValue;
                 for (int i = 0; i < blankList.Count; i++)
                 {
-                    //此落子处周围无相邻棋子则跳过
-                    if (!HasNeightnor(blankList[i])) continue;
-
                     m_searchCnt++;
                     LocalGridData grid = blankList[i];
 
@@ -187,7 +182,7 @@ namespace Tabletop.Local
                     best = Mathf.Min(best, value);
                     beta = Mathf.Min(beta, best);
                     //alpha-beta剪枝点
-                    if (beta < alpha)
+                    if (beta <= alpha)
                     {
                         Debug.Log($"剪枝时alpha: {alpha}, beta: {beta}");
                         m_cutCnt++;
