@@ -37,7 +37,7 @@ namespace Tabletop.Local
         private List<LocalGridData> m_allDrops;
         private List<LocalGridData> m_robotDrops;
         private List<LocalGridData> m_playerDrops;
-        public int Depth = 1;
+        public int Depth = 3;
         public int AtkRatio = 1;//AI的进攻性，默认为1
         private LocalGridData m_targetGrid;
 
@@ -62,7 +62,7 @@ namespace Tabletop.Local
             Debug.Log($"搜索次数:{m_searchCnt}, 剪枝次数:{m_cutCnt}");
 
             var piece = m_chessBasket.Get(m_robotColor);
-            //为null就随机下
+            //前两手下棋盘中心附近
             if (m_allDrops.Count <= 1)
             {
                 var x = m_map.Grids.Width / 2;
@@ -98,16 +98,15 @@ namespace Tabletop.Local
             }
             else if (Evaluation(currentColor, out int score))//有任意一方长连时提前返回
             {
-                Debug.Log($"长连: {2 * score}");
-                return 2 * score;
+                Debug.Log($"长连: {(2 + depth) * score}");
+                return (2 + depth) * score;
             }
 
-            var blankList = m_grids.Where(grid => !m_allDrops.Contains(grid) && HasNeightnor(grid)).ToList();
-
+            var blankList = m_grids.Where(grid => !m_allDrops.Contains(grid)).ToList();
+            LocalGridData bestGrid = null;
             if (currentColor == m_robotColor)
             {
                 float best = float.MinValue;
-
                 for (int i = 0; i < blankList.Count; i++)
                 {
                     //此落子处周围无相邻棋子则跳过
@@ -137,31 +136,34 @@ namespace Tabletop.Local
                     if (value > best)//使最大下限提高的点位作为目标落子点
                     {
                         best = value;
-                        m_targetGrid = grid;
+                        bestGrid = grid;
                     }
 
-                    Debug.Log($"剪枝前 alpha: {alpha}, beta: {beta}");
                     alpha = Mathf.Max(alpha, best);
                     //alpha-beta剪枝点
-                    if (beta <= alpha)
+                    if (beta < alpha)
                     {
                         Debug.Log($"剪枝时alpha: {alpha}, beta: {beta}");
                         m_cutCnt++;
                         break;
                     }
                 }
+
+                if (depth == this.Depth)
+                {
+                    m_targetGrid = bestGrid;
+                }
                 return best;
             }
             else
             {
                 float best = float.MaxValue;
-
                 for (int i = 0; i < blankList.Count; i++)
                 {
                     //此落子处周围无相邻棋子则跳过
                     if (!HasNeightnor(blankList[i])) continue;
-                    m_searchCnt++;
 
+                    m_searchCnt++;
                     LocalGridData grid = blankList[i];
 
                     if (currentColor == m_robotColor)
@@ -185,8 +187,9 @@ namespace Tabletop.Local
                     best = Mathf.Min(best, value);
                     beta = Mathf.Min(beta, best);
                     //alpha-beta剪枝点
-                    if (beta <= alpha)
+                    if (beta < alpha)
                     {
+                        Debug.Log($"剪枝时alpha: {alpha}, beta: {beta}");
                         m_cutCnt++;
                         break;
                     }
@@ -212,7 +215,8 @@ namespace Tabletop.Local
             }
 
             score = 0;
-            for (int i = 0; i < m_map.Grids.Width; i++)
+            //19x19x4 = 1600
+            for(int i = 0; i < m_map.Grids.Width; i++)
             {
                 for (int j = 0; j < m_map.Grids.Height; j++)
                 {
@@ -227,13 +231,13 @@ namespace Tabletop.Local
                     }
                 }
             }
+
             if (targetColor != m_robotColor)
             {
                 score *= -1;
             }
             return false;
         }
-
 
         private bool CalculateScore(LocalGridData grid, Vector2Int direction,
             List<LocalGridData> myList, List<LocalGridData> enemyList, out int score)
@@ -251,8 +255,8 @@ namespace Tabletop.Local
                 y = grid.Z + i * direction.y;
                 if (0 <= x && x < m_map.Grids.Width && 0 <= y && y < m_map.Grids.Height)
                 {
-                    //对方棋子阻隔 或 不成得分棋形 直接return
-                    if (enemyList.Contains(m_map.Grids[x, y]) || shape5.Equals("000"))
+                    //对方棋子阻隔直接return
+                    if (enemyList.Contains(m_map.Grids[x, y]))
                     {
                         return false;
                     }
