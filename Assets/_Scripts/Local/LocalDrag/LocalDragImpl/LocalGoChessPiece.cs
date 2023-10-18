@@ -5,7 +5,7 @@ namespace Tabletop.Local
     public class LocalGoChessPiece : LocalDragObj
     {
         //ºÚ°×Á½·½
-        [HideInInspector] public GoChessColor m_virtualColor = GoChessColor.Unknown;
+        [HideInInspector] protected GoChessColor m_virtualColor = GoChessColor.Unknown;
         public GoChessColor VirtualColor
         {
             set

@@ -1,14 +1,17 @@
 using QFramework;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Tabletop.Local
 {
-    public class LocalGobangRobot : IRobot
+    public class LocalGobangRobotWithValue : IRobot
     {
-        public LocalGobangRobot(GoChessColor color, LocalGoChessBasket chessBasket, LocalMapObj map)
+        private GoChessColor m_robotColor;
+        private LocalGoChessBasket m_chessBasket;
+        private LocalMapObj m_map;
+
+        public LocalGobangRobotWithValue(GoChessColor color, LocalGoChessBasket chessBasket, LocalMapObj map)
         {
             InitValueMap();
             InitWeights(map.Grids.Width, map.Grids.Height);
@@ -25,10 +28,6 @@ namespace Tabletop.Local
                 }
             }).UnRegisterWhenGameObjectDestroyed(map);
         }
-
-        private GoChessColor m_robotColor;
-        private LocalGoChessBasket m_chessBasket;
-        private LocalMapObj m_map;
 
         public IEnumerator OnTurnToRobot()
         {

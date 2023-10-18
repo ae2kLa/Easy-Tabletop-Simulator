@@ -30,7 +30,6 @@ namespace Tabletop.Local
             m_whiteBasket = Instantiate(WhiteBasket).GetComponent<LocalGoChessBasket>();
             m_map = Instantiate(Map).GetComponent<LocalMapObj>();
 
-
             WinEvent = new EasyEvent<GoChessColor>();
             WinEvent.Register((winColor) =>
             {
@@ -46,11 +45,11 @@ namespace Tabletop.Local
         {
             if (PlayerColor == GoChessColor.White)
             {
-                m_robot = new LocalGobangRobot(GoChessColor.Black, m_blackBasket, m_map);
+                m_robot = new LocalGobangRobotWithMiniMax(GoChessColor.Black, m_blackBasket, m_map);
             }
             else if (PlayerColor == GoChessColor.Black)
             {
-                m_robot = new LocalGobangRobot(GoChessColor.White, m_whiteBasket, m_map);
+                m_robot = new LocalGobangRobotWithMiniMax(GoChessColor.White, m_whiteBasket, m_map);
             }
             else
             {
