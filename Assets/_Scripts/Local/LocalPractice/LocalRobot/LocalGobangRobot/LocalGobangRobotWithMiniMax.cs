@@ -37,7 +37,7 @@ namespace Tabletop.Local
         private List<LocalGridData> m_allDrops;
         private List<LocalGridData> m_robotDrops;
         private List<LocalGridData> m_playerDrops;
-        public int Depth = 3;
+        public int Depth = 2;
         public int AtkRatio = 1;//AI的进攻性，默认为1
         private LocalGridData m_targetGrid;
 
@@ -72,7 +72,11 @@ namespace Tabletop.Local
             }
             else
             {
-                Minimax(m_robotColor, Depth, float.MinValue, float.MaxValue);
+                //if (m_robotColor == GoChessColor.White)
+                //    Minimax(GoChessColor.Black, Depth, float.MinValue, float.MaxValue);
+                //else
+                //    Minimax(GoChessColor.White, Depth, float.MinValue, float.MaxValue);
+                Minimax(true, Depth, float.MinValue, float.MaxValue);
                 Debug.Log($"搜索次数:{m_searchCnt}, 剪枝次数:{m_cutCnt}");
                 m_targetGrid.AttachArea.Attach(piece);
                 m_targetGrid = null;
@@ -87,23 +91,23 @@ namespace Tabletop.Local
         /// <param name="alpha">Alpha 是可能解的最大下限，也就是至少能够获得的评分，我方的步骤中会不断试图提高这个值。</param>
         /// <param name="beta">Beta 是可能解的最小上限，也就是最好能够获得的评分，对方的步骤中会不断试图降低这个值。</param>
         /// <returns></returns>
-        private float Minimax(GoChessColor currentColor, int depth, float alpha, float beta)
+        private float Minimax(bool selfTurn, int depth, float alpha, float beta)
         {
             if (depth == 0)
             {
-                Evaluation(currentColor, out int score);
+                Evaluation(selfTurn, out int score);
                 return score;
             }
-            else if (Evaluation(currentColor, out int score))//有任意一方长连时提前返回
-            {
-                Debug.Log($"长连: {(2 + depth) * score}");
-                return (2 + depth) * score;
-            }
+            //else if (Evaluation(selfTurn, out int score))//有任意一方长连时提前返回
+            //{
+            //    Debug.Log($"长连提前返回: {score}");
+            //    return score;
+            //}
 
             //相邻无棋子则跳过
             var blankList = m_grids.Where(grid => !m_allDrops.Contains(grid) && HasNeightnor(grid)).ToList();
             LocalGridData bestGrid = null;
-            if (currentColor == m_robotColor)
+            if (selfTurn)
             {
                 float best = float.MinValue;
                 for (int i = 0; i < blankList.Count; i++)
@@ -111,26 +115,18 @@ namespace Tabletop.Local
                     m_searchCnt++;
                     LocalGridData grid = blankList[i];
 
-                    if (currentColor == m_robotColor)
-                        m_robotDrops.Add(grid);
-                    else
-                        m_playerDrops.Add(grid);
+                    m_robotDrops.Add(grid);
                     m_allDrops.Add(grid);
 
                     float value;
-                    if (currentColor == GoChessColor.White)
-                        value = Minimax(GoChessColor.Black, depth - 1, alpha, beta);
-                    else
-                        value = Minimax(GoChessColor.White, depth - 1, alpha, beta);
+                    value = Minimax(false, depth - 1, alpha, beta);
 
-                    if (currentColor == m_robotColor)
-                        m_robotDrops.Remove(grid);
-                    else
-                        m_playerDrops.Remove(grid);
+                    m_robotDrops.Remove(grid);
                     m_allDrops.Remove(grid);
 
                     if (value > best)//使最大下限提高的点位作为目标落子点
                     {
+                        Debug.Log($"提高下限:value: {value}");
                         best = value;
                         bestGrid = grid;
                     }
@@ -139,7 +135,7 @@ namespace Tabletop.Local
                     //alpha-beta剪枝点
                     if (beta <= alpha)
                     {
-                        Debug.Log($"剪枝时alpha: {alpha}, beta: {beta}");
+                        //Debug.Log($"剪枝时alpha: {alpha}, beta: {beta}");
                         m_cutCnt++;
                         break;
                     }
@@ -159,22 +155,13 @@ namespace Tabletop.Local
                     m_searchCnt++;
                     LocalGridData grid = blankList[i];
 
-                    if (currentColor == m_robotColor)
-                        m_robotDrops.Add(grid);
-                    else
-                        m_playerDrops.Add(grid);
+                    m_playerDrops.Add(grid);
                     m_allDrops.Add(grid);
 
                     float value;
-                    if (currentColor == GoChessColor.White)
-                        value = Minimax(GoChessColor.Black, depth - 1, alpha, beta);
-                    else
-                        value = Minimax(GoChessColor.White, depth - 1, alpha, beta);
+                    value = Minimax(true, depth - 1, alpha, beta);
 
-                    if (currentColor == m_robotColor)
-                        m_robotDrops.Remove(grid);
-                    else
-                        m_playerDrops.Remove(grid);
+                    m_playerDrops.Remove(grid);
                     m_allDrops.Remove(grid);
 
                     best = Mathf.Min(best, value);
@@ -182,7 +169,7 @@ namespace Tabletop.Local
                     //alpha-beta剪枝点
                     if (beta <= alpha)
                     {
-                        Debug.Log($"剪枝时alpha: {alpha}, beta: {beta}");
+                        //Debug.Log($"剪枝时alpha: {alpha}, beta: {beta}");
                         m_cutCnt++;
                         break;
                     }
@@ -192,11 +179,11 @@ namespace Tabletop.Local
         }
 
         //估价函数
-        private bool Evaluation(GoChessColor targetColor, out int score)
+        private bool Evaluation(bool selfTurn, out int score)
         {
             List<LocalGridData> myList;
             List<LocalGridData> enemyList;
-            if (targetColor == m_robotColor)
+            if (selfTurn)
             {
                 myList = m_robotDrops;
                 enemyList = m_playerDrops;
@@ -208,7 +195,7 @@ namespace Tabletop.Local
             }
 
             score = 0;
-            //19x19x4 = 1600
+            //19x19x8 = 3200
             for(int i = 0; i < m_map.Grids.Width; i++)
             {
                 for (int j = 0; j < m_map.Grids.Height; j++)
@@ -221,14 +208,17 @@ namespace Tabletop.Local
                             return true;
                         }
                         score += myScore;
+
+                        if (CalculateScore(m_map.Grids[i, j], m_directions[k], enemyList, myList, out int enemyScore))
+                        {
+                            score -= enemyScore;
+                            return true;
+                        }
+                        score -= enemyScore;
                     }
                 }
             }
 
-            if (targetColor != m_robotColor)
-            {
-                score *= -1;
-            }
             return false;
         }
 
@@ -274,7 +264,6 @@ namespace Tabletop.Local
             if (m_shapeWeightMap.ContainsKey(shape5))
             {
                 score += m_shapeWeightMap[shape5];
-
                 //长连直接return
                 if (shape5.Equals("11111"))
                 {
@@ -331,7 +320,8 @@ namespace Tabletop.Local
             {"11110", 500},
             {"011110", 5000},
 
-            {"11111", 500000}
+            {"11111", 500000},
+            {"111111", 500000}
         };
 
         private bool HasNeightnor(LocalGridData grid)
